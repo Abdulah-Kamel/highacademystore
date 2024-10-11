@@ -1,0 +1,63 @@
+/****   srart tree ahmed ali ************************/
+.tree li {
+    list-style-type:none;
+    margin:0;
+    padding:10px 5px 0 5px;
+    position:relative
+}
+.tree li::before,
+.tree li::after {
+    content: '';
+    right: -20px;
+    position: absolute;
+    left: auto;
+}
+.tree li::before {
+    border-left:2px solid #999;
+    bottom:50px;
+    height:100%;
+    top:0;
+    width:1px
+}
+.tree li::after {
+    border-top:2px solid #999;
+    height:20px;
+    top:25px;
+    width:25px
+}
+/*
+.tree li i{
+    color: #999;
+}*/
+.tree li span {
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    border:2px solid #999;
+    border-radius:3px;
+    display:inline-block;
+    padding:3px 8px;
+    text-decoration:none;
+    cursor:pointer;
+}
+.tree>ul>li::before,
+.tree>ul>li::after {
+    border:0
+}
+.tree li:last-child::before {
+    height:27px
+}
+.tree li span:hover {
+    background: #d0d0d0;
+    border: 2px solid #adadad;
+}
+[aria-expanded="false"] > .expanded,
+[aria-expanded="true"] > .collapsed {
+    display: none;
+}
+.tree li a{
+    text-decoration: none;
+    color: #666
+}
+.searchTree ul{
+    padding-right: 40px !important;
+}
