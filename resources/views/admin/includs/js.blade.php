@@ -7,7 +7,8 @@
     <script src="{{url('/')}}/admin/assets/js/jquery.min.js"></script>
     {{-- <script src=" {{url('/')}}/admin/assets/js/toastr.js"></script> --}}
 
-    <script src="{{ url('/') }}/admin/assets/js/datatables.min.js"></script>
+    {{-- <script src="{{ url('/') }}/admin/assets/js/datatables.min.js"></script> --}}
+    
 
 
     <script src="{{url('/')}}/admin/assets/js/bundle/sweetalert2.bundle.js"></script>

@@ -31348,36 +31348,26 @@ button:focus:not(:focus-visible) {
 .print_invoice .items td.blank {
     border: 0
 }
-
 @media print {
-    body * {
-        visibility: hidden;
-        margin: 0;
-        color: #000;
-        background-color: #fff
+    .navigation, .sidebar, .delete,.page-header,.page-footer,.card-header,#stateFilter {
+        display: none !important;
     }
 
-    .print_invoice {
-        position: absolute;
-        left: 0;
-        top: 0
+    #myTable, .other-content {
+        visibility: visible;
     }
+    .table{
+        width:100%;
+        height:100%;
+    }
+}
 
-    .print_invoice * {
-        visibility: visible
-    }
-
-    .print_invoice * #hiderow, .print_invoice * .delete {
-        display: none
-    }
-
-    .print_invoice .footer-note .form-control {
-        padding: 0
-    }
-
-    .navigation, .sidebar {
-        display: none
-    }
+.dt-print-view{
+    .table{
+    direction: rtl;
+        overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+}
 }
 
 .animation-wrapper {

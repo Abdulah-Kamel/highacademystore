@@ -41,6 +41,7 @@ Route::group(
         Route::name('user.')->group(function () {
             Route::get('/', [UserController::class, 'index'])->name('home');
             Route::get('/login', [UserController::class, 'login'])->middleware("guest")->name('login.user');
+            Route::get('/register', [UserController::class, 'register'])->middleware("guest")->name('register.user');
             Route::post('user/login', [UserController::class, 'loginSubmit'])->name('login.submit');
             Route::post('user/register', [UserController::class, 'registerSubmit'])->name('register.submit');
             Route::get('user/logout', [UserController::class, 'userLogout'])->name('logout');

@@ -7,8 +7,8 @@ High Academy Store
 @section('content')
     <!-- Carousel Start -->
     <div class="container-fluid mb-3">
-        <div class="row px-xl-5">
-            <div class="col-lg-8  col-sm-8">
+        <div class="row px-xl-5 g-5">
+            <div class="col-lg-8  col-12">
                 <div id="header-carousel" class="carousel slide carousel-fade mb-30 mb-lg-0" data-ride="carousel">
                     <ol class="carousel-indicators">
                         <li data-target="#header-carousel" data-slide-to="0" class="active"></li>
@@ -87,7 +87,7 @@ High Academy Store
     <div class="container-fluid pt-5 pb-3">
         <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-5"><span class="bg-secondary pr-3">الكتب
                 المضافه حديثا </span></h2>
-        <div class="row px-xl-5">
+        <div class="row px-xl-5 g-5">
             @include('user.layouts.product')
         </div>
     </div>
@@ -97,7 +97,7 @@ High Academy Store
     <div class="container-fluid pt-5">
         <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">كتب
                 المدرسين الاونلاين</span></h2>
-        <div class="row px-xl-5 pb-3">
+        <div class="row px-xl-5 g-2 pb-3">
             @foreach ($teachers as $item)
                 <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
                     <a class="text-decoration-none" href="{{ route('user.shop') }}">
@@ -122,7 +122,7 @@ High Academy Store
     <div class="container-fluid pt-5 pb-3">
         <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">جميع
                 الكتب داخل متجرنا</span></h2>
-        <div class="row px-xl-5">
+        <div class="row px-xl-5 g-5">
             @include('user.layouts.product')
         </div>
     </div>
@@ -130,7 +130,7 @@ High Academy Store
 
     <!-- Offer Start -->
     <div class="container-fluid pt-5 pb-3">
-        <div class="row px-xl-5">
+        <div class="row px-xl-5 g-5">
             <div class="col-md-6">
                 <div class="product-offer mb-30" style="height: 300px;">
                     <img class="img-fluid" src="{{ asset('/front') }}/img/offer-1.jpg" alt="">
@@ -157,7 +157,7 @@ High Academy Store
 
     <!-- Featured Start -->
     <div class="container-fluid pt-5">
-        <div class="row px-xl-5 pb-3">
+        <div class="row px-xl-5 g-5 pb-3">
             <div class="col-lg-3 col-md-6 col-sm-12 pb-1 right">
                 <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
                     <h1 class="fa fa-check text-primary m-0 mr-3"></h1>
@@ -187,7 +187,7 @@ High Academy Store
     <!-- Featured End -->
     <!-- Vendor Start -->
     <div class="container-fluid py-5">
-        <div class="row px-xl-5">
+        <div class="row px-xl-5 g-5">
             <div class="col">
                 <div class="owl-carousel vendor-carousel">
                     <div class="bg-light p-4">

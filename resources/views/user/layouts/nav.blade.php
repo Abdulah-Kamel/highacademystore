@@ -44,22 +44,14 @@
                     <span class="h1 text-uppercase text-light bg-warning px-1 ml-n1"
                         style="font-size: 21px; padding-top: 5px;padding-bottom: 5px;">Academey Store</span>
                 </a>
-                <div class="navbar-nav ml-auto   d-lg-block">
-                    @auth
-                    <a href="{{ route('user.cart') }}" class="btn px-0 ml-3">
-                        <i class="fas fa-shopping-cart text-warning"></i>
-                        <span class="badge text-secondary border border-secondary rounded-circle"
-                            style="padding-bottom: 2px;">{{Cart::instance('shopping')->count()}}</span>
-                    </a>
-                    @endauth
-                </div>
+              
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
 
                 <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                    <div class="navbar-nav mr-auto py-0">
+                    <div class="navbar-nav m-auto py-0">
                         <a href="{{ route('user.home') }}" class="nav-item nav-link active">الرئيسية </a>
                         <a href="{{ route('user.shop') }}" class="nav-item nav-link">المتجر</a>
                         <a href="https://egyptpost.gov.eg/ar-eg//Home/EServices/Track-And-Trace"
@@ -68,6 +60,9 @@
 
                         <a href="{{ route('user.contact') }}" class="nav-item nav-link">تواصل معنا </a>
 
+                   
+                    </div>
+                    <div class="navbar-nav ml-auto d-lg-flex align-items-center justify-content-end">
                         @auth
                         <a href="{{ route('user.orders.user') }}" class="nav-item nav-link">طلبياتي</a>
                         {{-- <a href="{{ route('user.card') }}" class="nav-item nav-link">سلة المشتريات </a> --}}

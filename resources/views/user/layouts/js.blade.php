@@ -40,7 +40,7 @@
                 $('#add_to_cart' + product_id).html('<i class="fas fa-spinner fa-spin"></i>');
             },
             complete: function() {
-                $('#add_to_cart' + product_id).html('<i class="fas fa-cart-plus"></i>');
+                $('#add_to_cart' + product_id).html('<i class="fa-solid fa-plus"></i>');
             },
             success: function(data) {
                 console.log(data);
@@ -161,5 +161,29 @@
             },
         });
     }
+</script>
+<script>
+      $(document).on("click", ".login", function () {
+        swal({
+            title: "حدث خطأ",
+            text: "يجب عليك تسجيل الدخول اولًا",
+            icon: "warning",
+        })
+    })
+</script>
+<script>
+     document.querySelectorAll(".price").forEach(function (item) {
+        item.addEventListener("mouseover", function () {
+            const tooltip = item.querySelector(".tooltip-text");
+            tooltip.style.visibility = "visible";
+            tooltip.style.opacity = "1";
+        });
+
+        item.addEventListener("mouseout", function () {
+            const tooltip = item.querySelector(".tooltip-text");
+            tooltip.style.visibility = "hidden";
+            tooltip.style.opacity = "0";
+        });
+    });
 </script>
 <!-- End Cart Script -->

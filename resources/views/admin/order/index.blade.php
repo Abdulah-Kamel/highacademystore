@@ -10,6 +10,22 @@ orders
     td {
         font-size: 20px:
     }
+    .filter-btn{
+        justify-content: space-between;
+    }
+    @media only screen and (max-width: 445px) {
+        .filter-btn{
+            justify-content: center;
+          
+        }
+    }
+    @media only screen and (max-width: 600px) {
+        .filter-btn{
+            div:not(:last-child) {
+                margin-bottom: 15px;
+            }
+        }
+    }
 </style>
 <div class="col-12">
     <div class="card">
@@ -62,6 +78,13 @@ orders
 </div>
 @endsection
 @section('js')
+<script src="https://cdn.datatables.net/2.3.5/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.5/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.5/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.5/js/buttons.print.min.js"></script>
 <script>
     $(document).ready(function () {
         var table = $('#myTable').DataTable({
@@ -89,7 +112,27 @@ orders
                 { data: 'image', name: 'image' },
                 { data: 'state', name: 'state' },
                 { data: 'details', name: 'details' },
-            ]
+            ],
+"dom": '<"d-flex filter-btn flex-wrap align-items-center" lfB>rtip',
+            "buttons": [
+                {
+                    extend: 'excelHtml5',
+                    text: 'تصدير إلى Excel',
+                    title: 'اخر الطلبات',
+                    titleAttr: 'Excel',
+                    className: 'btn btn-success',
+                    excelStyles: {
+                    sheetName: 'الطلبات',
+                }
+                },
+                {
+                    extend: 'print',
+                    text: 'طباعة',
+                    titleAttr: 'طباعة',
+                    className: 'btn btn-primary',
+                }
+            ],
+            scrollX: true,
         });
 
         // تشغيل الفلترة عند تغيير قيمة القائمة

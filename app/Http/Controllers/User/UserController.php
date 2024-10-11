@@ -74,7 +74,7 @@ class UserController extends Controller
     public function productDetail($id)
     {
         $product = Product::FindOrFail($id);
-       // return $product->brands;
+        // return $product->brands;
         return view('user.details', compact('product'));
     }
 
@@ -118,13 +118,13 @@ class UserController extends Controller
 
     public function loginSubmit(Request $request)
     {
-       $request->validate([
-    'email' => 'required|email|exists:users,email',
-    'password' => 'required|min:6',
-], [
-    'email.exists' => 'البريد الإلكتروني الذي أدخلته غير مسجل لدينا.',
-     'password.min' => 'كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل.',
-]);
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|min:6',
+        ], [
+            'email.exists' => 'البريد الإلكتروني الذي أدخلته غير مسجل لدينا.',
+            'password.min' => 'كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل.',
+        ]);
 
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             Session::put('user', $request->email);
@@ -137,37 +137,61 @@ class UserController extends Controller
             }
         } else {
             // toastr()->error('Invaild Email & Password');
-            return redirect()->back();
+            return redirect()->back()->withErrors(['password' => 'كلمة المرور غير صحيحة.']);
         }
+    }
+
+    public function register()
+    {
+        Session::put('url.intended', URL::previous());
+        return view('user.register');
     }
 
     public function registerSubmit(Request $request)
     {
-        // dd($request->all());
-        $this->validate(
-            $request,
-            [
-                'name' => 'string|required',
-                'email' => 'required|unique:users',
-                'phone' => 'required|numeric',
+        // Validate the request
+        try {
+            $validatedData = $request->validate([
+                'name' => 'string|required|regex:/^[\p{Arabic}\s]+$/u',
+                'email' => 'required|unique:users,email',
+                'phone' => 'required|numeric|regex:/^(01[0125])[0-9]{8}$/',
                 'address' => 'required',
                 'password' => 'min:6|required|confirmed',
-            ]
-        );
-        $data = $request->all();
-        $data['password'] = bcrypt($request->password);
-        $check = User::create($data);
-        // Session::put('user',$data['email']);
-        Auth::login($check);
+            ], [
+                'name.required' => 'الاسم مطلوب.',
+                'email.required' => 'البريد الإلكتروني مطلوب.',
+                'email.unique' => 'البريد الإلكتروني مسجل لدينا مسبقاً.',
+                'phone.required' => 'رقم الهاتف مطلوب.',
+                'address.required' => 'العنوان مطلوب.',
+                'password.required' => 'كلمة المرور مطلوبة.',
+                'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 حروف.',
+                'password.confirmed' => 'كلمة المرور غير مطابقة.',
+                'phone.regex' => 'رقم الهاتف يجب أن يتكون من 11 رقم.',
+                'phone.numeric' => 'رقم الهاتف يجب أن يحتوي على ارقام فقط.',
+                'name.regex' => 'الاسم يجب أن يكون عربى.',
+            ]);
 
-        if ($check) {
-            // toastr()->success('Successfuly Register');
+            // Create the user with validated data
+            $validatedData['password'] = bcrypt($request->password); // Hash the password
+            $user = User::create($validatedData); // Create user
+
+            // Log the user in if the registration is successful
+            Auth::login($user);
+
+            // Redirect to the user's home page after registration
             return redirect()->route('user.home');
-        } else {
-            // toastr()->error('An error has occurred please try again later.');
-            return redirect()->back();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Add "حاول مرة أخرى" to each validation error
+            $errors = $e->validator->errors()->all();
+            $customErrors = array_map(function ($error) {
+                return $error . ' حاول مرة أخرى';
+            }, $errors);
+
+            // Redirect back with custom error messages
+            return redirect()->back()->withErrors($customErrors);
         }
     }
+
 
     public function userLogout()
     {
@@ -176,5 +200,7 @@ class UserController extends Controller
         // toastr()->success('Successfuly Logout');
         return redirect()->route('user.home');
     }
-
+    
+    
 }
+

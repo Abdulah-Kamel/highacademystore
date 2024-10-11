@@ -70,7 +70,7 @@ online shop
                     {{--
                 </div> --}}
             </div>
-            <div class="row pb-3">
+            <div class="row pb-3 g-5">
 
                 @include('user.layouts.product')
             </div>

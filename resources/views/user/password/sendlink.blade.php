@@ -14,18 +14,24 @@ High Academy Store || reset password
                     <div class="card-body">
                         @if ($errors->any())
                         <div class="alert alert-danger">
-                            <ul>
+                            <ul class="list-unstyled d-flex justify-content-center align-items-center">
                                 @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
                         </div>
                         @endif
+                        @if (session('status'))
+                        <div class="alert alert-success">
+                            <ul class="list-unstyled d-flex justify-content-center align-items-center">
+                                <li>{{ session('status') }}</li>
+                            </ul>
+                        </div>
+                        @endif
 
                         <form method="POST" action="{{ route('password.email') }}">
                             @csrf
-                            @include('user.partials._errors')
-                            <div class="mb-3">
+                             <div class="mb-3">
                                 <label for="exampleFormControlInput1" class="form-label">البريد الالكتروني</label>
                                 <input type="email" name="email" class="form-control" required
                                     id="exampleFormControlInput1">

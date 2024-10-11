@@ -9671,8 +9671,8 @@ a.text-dark:hover, a.text-dark:focus {
   transition: .5s;
 }
 
-.product-item:hover .product-img img {
-  transform: scale(1.2);
+.product-item:hover {
+  transform: scale(1.05);
 }
 
 .product-item .btn:hover {
