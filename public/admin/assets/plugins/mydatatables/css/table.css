@@ -1,0 +1,134 @@
+.table-bordered, .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th {
+    border: 1px solid #ddd;
+}
+.table-header {
+    background-color: #307ECC;
+    color: #FFF;
+    font-size: 14px;
+    line-height: 38px;
+    padding-left: 12px;
+    margin-bottom: 1px;
+}
+.dataTables_length{
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #EFF3F8;
+    width: 50%;
+}
+.dataTables_filter{
+    padding-top: 7px;
+    /*padding-bottom: 7px;*/
+    /* background-color: #8896a9;*/
+    width: 50%;
+}
+.dataTables_filter label{
+    color: #000;
+    margin-right: 10px;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: right;
+}
+.ace-nav>li.margin-4, .label-sm.arrowed, .label-sm.arrowed-in, .ui-jqdialog-content .searchFilter table {
+    margin-left: 4px;
+}
+.badge-inverse, .badge.badge-inverse, .label-inverse, .label.label-inverse {
+    background-color: #333;
+}
+.table2 table thead tr {
+    color: #707070;
+    font-weight: 400;
+    background-color: #eee;
+}
+
+/*bootom footer of table*/
+
+.dataTables_paginate {
+ padding-top: 12px;
+ padding-bottom: 12px;
+ background-color: #EFF3F8;
+ width: 50%;
+}
+.dataTables_wrapper .dataTables_info{
+ padding-top: 15px;
+ padding-bottom: 15px;
+ background-color: #EFF3F8;
+ width: 50%;
+}
+@media(max-width: 767px){
+.dataTables_wrapper .dataTables_info,
+div.dt-buttons ,
+.dataTables_paginate
+{
+    width: 100%;
+}
+}
+.btn-group>.btn, .btn-group>.btn+.btn, .btn-group>.btn:first-child, .fc .fc-button-group>* {
+    margin: 0 1px 0 0;
+}
+
+
+div.dt-buttons {
+    position: relative;
+    float: left;
+    /* margin-top: 12px; */
+    /*background-color: #8896a9;*/
+    width: 50%;
+    /*padding-top: 7px;*/
+    padding-bottom: 1px;
+}
+div.dt-buttons .dt-button,
+div.dt-buttons .buttons-html5{
+    position: relative;
+    top: 3px;
+}
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
+
+    vertical-align: middle;
+
+}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 5px 0px;
+        vertical-align: middle;
+    text-align: center;
+    font-size: 12px;
+}
+
+@media (max-width: 991px){
+    div.dt-buttons{
+        width: 100%;
+    }
+    .dataTables_filter{
+        width: 100%;
+    }
+    
+}
+
+table.dataTable thead th, table.dataTable thead td {
+       padding: 8px 5px 8px 15px; 
+    vertical-align: middle;
+    text-align: center;
+    font-size: 12px;
+}
+tr.odd.selected{
+    background-color: #acbad4;
+}
+
+/*
+table {
+    counter-reset: rowCounter;
+    border-collapse: collapse;
+}
+tr td:first-child {
+    counter-increment: rowCounter;
+}
+
+td:first-child::before {
+    content: counter(rowCounter);
+
+}
+*/
+
+
+
+
