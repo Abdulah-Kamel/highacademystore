@@ -207,12 +207,14 @@ class CheckoutController extends Controller
                 if (! preg_match('/^01[0125][0-9]{8}$/', $val)) $fail('رقم الهاتف الاحتياطي غير صحيح');
             }],
         ], [
-            'government.required' => 'برجاء اختيار المحافظة',
-            'city.required'      => 'برجاء اختيار المدينة',
-            'address.required'   => 'برجاء ادخال العنوان التفصيلي',
-            'user_name.required' => 'برجاء ادخال الاسم',
-            'mobile.required'    => 'برجاء ادخال رقم الموبايل',
+            'government.required'  => 'برجاء اختيار المحافظة',
+            'city.required'        => 'برجاء اختيار المدينة',
+            'address.required'     => 'برجاء ادخال العنوان التفصيلي',
+            'user_name.required'   => 'برجاء ادخال الاسم',
+            'mobile.required'      => 'برجاء ادخال رقم الموبايل',
+            'mobile.digits'        => 'رقم الموبايل يجب أن يتكون من 11 رقمًا',
             'temp_mobile.required' => 'برجاء ادخال رقم الموبايل الاحتياطي',
+            'temp_mobile.digits'   => 'رقم الموبايل الاحتياطي يجب أن يتكون من 11 رقمًا',
         ]);
 
         if ($validator->fails()) {

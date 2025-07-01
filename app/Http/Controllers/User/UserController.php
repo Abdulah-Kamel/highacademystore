@@ -137,7 +137,6 @@ class UserController extends Controller
     {
         $user = auth()->user();
         $cartItems = Cart::instance('shopping')->content();
-        $cardId = $request->query('id');
 
         // ✅ Check if any item in the cart is deleted
         foreach ($cartItems as $item) {
@@ -146,17 +145,35 @@ class UserController extends Controller
                 Cart::instance('shopping')->remove($item->rowId);
             }
         }
-        $orders = null;
-        if ($cardId) {
-            $orders = UserAddress::find($cardId);
-        }
+
         if (count(Cart::instance('shopping')->content()) == 0) {
             return redirect(env('APP_URL'))->with('warning', 'تم حذف المنتجات الغير متاحة.');
         }
-        $shippingMethods = ShippingMethod::all();
 
+        $orders = null; // Keep the variable name 'orders' for the view
+
+        // Check if an address ID is provided (for saved addresses)
+        if ($request->has('id') && !empty($request->id)) {
+            $orders = \App\Models\UserAddress::find($request->id);
+        }
+        // Otherwise, check for address details in the query string (for temporary addresses)
+        elseif ($request->has('name') && $request->has('mobile')) { // check for core fields
+            // Create a new UserAddress instance from the request data, but don't save it.
+            $orders = new \App\Models\UserAddress($request->only([
+                'name',
+                'mobile',
+                'temp_mobile',
+                'governorate',
+                'city',
+                'address',
+                'near_post'
+            ]));
+        }
+
+        $shippingMethods = ShippingMethod::all();
         $governoratesData = json_decode(File::get(storage_path('cities/governorates.json')), true);
         $citiesData = json_decode(File::get(storage_path('cities/cities.json')), true);
+
         return view('user.card', compact('governoratesData', 'citiesData', 'orders', 'shippingMethods'));
     }
 
@@ -164,9 +181,55 @@ class UserController extends Controller
     public function cardData()
     {
         $user = auth()->user();
-        $userid = $user->id;
-        $addresses = UserAddress::where('user_id', $userid)->get();
-        return view('user.card_data', compact('addresses'));
+
+        // 1. Get saved addresses
+        $savedAddresses = \App\Models\UserAddress::where('user_id', $user->id)->get();
+
+        // 2. Get addresses from the last 3 orders and parse them
+        $orderAddresses = \App\Models\Order::where('user_id', $user->id)
+            ->latest()
+            ->limit(3)
+            ->get()
+            ->map(function ($order) {
+                $governorate = null;
+                $city = null;
+
+                // The detailed address is in `address2`.
+                $detailedAddress = $order->address2;
+
+                // `address` contains the combined governorate and city string.
+                $govCityString = $order->address;
+
+                // Split the governorate and city string.
+                $addressParts = preg_split('/(\s*-\s*|\s*,\s*)/', $govCityString, 2);
+
+                if (count($addressParts) === 2) {
+                    $governorate = trim($addressParts[0]);
+                    $city = trim($addressParts[1]);
+                } elseif (count($addressParts) === 1) {
+                    // If only one part, assume it's the governorate.
+                    $governorate = trim($addressParts[0]);
+                }
+
+                return new \App\Models\UserAddress([
+                    'name' => $order->name,
+                    'mobile' => $order->mobile,
+                    'temp_mobile' => $order->temp_mobile,
+                    'governorate' => $governorate,
+                    'city' => $city,
+                    'address' => $detailedAddress, // Use the content of address2
+                    'near_post' => $order->near_post,
+                ]);
+            });
+
+        // 3. Merge and make unique
+        $allAddresses = $savedAddresses->concat($orderAddresses);
+        $uniqueAddresses = $allAddresses->unique(function ($address) {
+            // Make uniqueness check more robust
+            return trim($address->name) . trim($address->mobile) . trim($address->governorate) . trim($address->city) . trim($address->address);
+        });
+
+        return view('user.card_data', ['addresses' => $uniqueAddresses->values()]);
     }
 
 
@@ -260,18 +323,9 @@ class UserController extends Controller
     public function myvouchers()
     {
         $user = auth()->user();
-
         $vouchers = Voucher::where('is_used', 1)->where("user_id", $user->id)->orderBy('updated_at', 'desc')->get();
         return view("user.myvouchers", compact("vouchers"));
     }
-
-    public function order_details($id)
-    {
-        $order = Order::findorfail($id);
-        return view('user.orderdetails', compact('order'));
-    }
-    
-    
 
     public function login()
     {

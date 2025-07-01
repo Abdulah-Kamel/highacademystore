@@ -86,14 +86,18 @@
                 <div class="col-md-6">
                     <div class="card mt-3 mx-auto cardLink" style="width: 100%; border-radius: 20px;" dir="rtl">
                         <div class="card-body rounded-5">
-                            <div class="d-flex justify-content-between mb-2">
-                                <strong class="title">المحافظة </strong>
-                                <strong>{{ $address->governorate }}</strong>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <strong class="title">المدينة</strong>
-                                <strong>{{ $address->city }}</strong>
-                            </div>
+                            @if ($address->governorate)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong class="title">المحافظة </strong>
+                                    <strong>{{ $address->governorate }}</strong>
+                                </div>
+                            @endif
+                            @if ($address->city)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong class="title">المدينة</strong>
+                                    <strong>{{ $address->city }}</strong>
+                                </div>
+                            @endif
                             <div class="d-flex justify-content-between mb-2">
                                 <strong class="title">عنوان الشحن</strong>
                                 <strong>{{ $address->address }}</strong>
@@ -110,14 +114,34 @@
                                 <strong class="title">رقم الموبيل الاحتياطي</strong>
                                 <strong>{{ $address->temp_mobile }}</strong>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <strong class="title">اسم اقرب مكتب بريد</strong>
-                                <strong>{{ $address->near_post }}</strong>
-                            </div>
+                            @if ($address->near_post)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong class="title">اسم اقرب مكتب بريد</strong>
+                                    <strong>{{ $address->near_post }}</strong>
+                                </div>
+                            @endif
                         </div>
                         <div class="action-buttons">
-                            <a href="{{ route('user.shipping.edit', $address->id) }}" class="edit_btn">تعديل البيانات</a>
-                            <a href="{{ route('user.card') }}?id={{ $address->id }}" class="select_btn">اختيار هذه البيانات</a>
+                            @if ($address->id)
+                                {{-- For saved addresses with an ID --}}
+                                <a href="{{ route('user.shipping.edit', $address->id) }}" class="edit_btn">تعديل</a>
+                                <a href="{{ route('user.card') }}?id={{ $address->id }}" class="select_btn">اختيار</a>
+                            @else
+                                {{-- For addresses from orders, pass data in query string --}}
+                                @php
+                                    $queryParams = [
+                                        'name' => $address->name,
+                                        'mobile' => $address->mobile,
+                                        'temp_mobile' => $address->temp_mobile,
+                                        'governorate' => $address->governorate,
+                                        'city' => $address->city,
+                                        'address' => $address->address,
+                                        'near_post' => $address->near_post,
+                                    ];
+                                @endphp
+                                <a href="{{ route('user.card') }}?{{ http_build_query(array_filter($queryParams)) }}"
+                                    class="select_btn w-100" style="border-radius: 0 0 20px 20px;">اختيار هذه البيانات</a>
+                            @endif
                         </div>
                     </div>
                 </div>
