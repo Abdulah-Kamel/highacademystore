@@ -135,7 +135,7 @@ class OrderController extends Controller
             ->addColumn('shipping_method', function ($row) {
                 if ($method = $row->shipping) {
                     if ($method->address) {
-                        return "{$method->name} — {$method->address}";
+                        return "{$method->name}";
                     } else {
                         return "{$method->name}";
                     }

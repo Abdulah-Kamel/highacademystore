@@ -140,13 +140,17 @@
                                     ];
                                 @endphp
                                 <a href="{{ route('user.card') }}?{{ http_build_query(array_filter($queryParams)) }}"
-                                    class="select_btn w-100" style="border-radius: 0 0 20px 20px;">اختيار هذه البيانات</a>
+                                    class="select_btn">اختيار هذه البيانات</a>
                             @endif
                         </div>
                     </div>
                 </div>
             @endforeach
         </div>
+       <div class="text-center">
+        <a type="button" href="{{ route('user.card') }}" class="btn btn-danger rounded-3 w-50 mt-3 btn-lg">تخطي</a>
+       </div>
+
     </div>
     <?php
     if ($addresses->count() == 0) {

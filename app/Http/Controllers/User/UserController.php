@@ -187,6 +187,9 @@ class UserController extends Controller
 
         // 2. Get addresses from the last 3 orders and parse them
         $orderAddresses = \App\Models\Order::where('user_id', $user->id)
+            ->whereHas('shipping', function ($query) {
+                $query->where('type', '!=', 'branch');
+            })
             ->latest()
             ->limit(3)
             ->get()
@@ -211,10 +214,20 @@ class UserController extends Controller
                     $governorate = trim($addressParts[0]);
                 }
 
+                $mobile = $order->mobile;
+                if ($mobile && substr($mobile, 0, 1) !== '0') {
+                    $mobile = '0' . $mobile;
+                }
+
+                $temp_mobile = $order->temp_mobile;
+                if ($temp_mobile && substr($temp_mobile, 0, 1) !== '0') {
+                    $temp_mobile = '0' . $temp_mobile;
+                }
+
                 return new \App\Models\UserAddress([
                     'name' => $order->name,
-                    'mobile' => $order->mobile,
-                    'temp_mobile' => $order->temp_mobile,
+                    'mobile' => $mobile,
+                    'temp_mobile' => $temp_mobile,
                     'governorate' => $governorate,
                     'city' => $city,
                     'address' => $detailedAddress, // Use the content of address2
@@ -325,6 +338,11 @@ class UserController extends Controller
         $user = auth()->user();
         $vouchers = Voucher::where('is_used', 1)->where("user_id", $user->id)->orderBy('updated_at', 'desc')->get();
         return view("user.myvouchers", compact("vouchers"));
+    }
+    public function order_details($id)
+    {
+        $order = Order::findorfail($id);
+        return view('user.orderdetails', compact('order'));
     }
 
     public function login()

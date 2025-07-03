@@ -73,7 +73,7 @@ class CheckoutController extends Controller
 
         // 1) Branch pickup: free
         if ($method->type === 'branch') {
-            $address = "{$method->name} — {$method->address}";
+            $address = "{$method->name}";
             return [$address, $baseFee];
         }
 
