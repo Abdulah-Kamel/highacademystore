@@ -118,7 +118,7 @@
             <h1>High Academy Store</h1>
         </div>
         <div class="content">
-            <h2>أهلاً {{ $order->name }}, طلبك في الطريق!</h2>
+            <h2>أهلاً {{ $order->name }}, طلبك قيد التجهيز!</h2>
             <p>شكراً لطلبك من متجرنا. طلبك رقم <strong>#{{ $order->id }}</strong> قد تم تأكيده وسنبدأ في تجهيزه
                 فوراً.</p>
 

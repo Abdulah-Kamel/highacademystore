@@ -249,10 +249,12 @@ class OrderController extends Controller
 
             DB::commit();
 
+            $shippingMethod = ShippingMethod::find($order->shipping_method);
+
             $details = [
                 'id' => $order->id,
                 'name' => $order->name,
-                'shipping' => $order->shipping,
+                'shipping' => $shippingMethod,
                 'barcode' => $order->barcode
             ];
 

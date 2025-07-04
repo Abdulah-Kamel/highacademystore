@@ -37,18 +37,26 @@
         </style>
     </head>
     <body dir="rtl">
-        <h1>عميلنا العزيز , تم شحن الاوردر الخاص بك بنجاح</h1>
+        <h1>عميلنا العزيز , تم شحن الاوردر الخاص بك بنجاح</h1>
         <div>
-            <p>الشحنة بتاخد من يومين الى خمس ايام عمل عشان توصلك سواء شحنت لأقرب مكتب بريد أو لحد البيت</p>
-            <p>
-                لمتابعة شحنتك حتى وصولها مكتب البريد 
-                انسخ البار كود دا {{ $details['barcode'] }}
-            </p>
-            <a style="background-color: #007bff; color: white; padding: 15px 20px; border-radius: 10px; text-decoration: none; display: block;text-align: center;" href="https://egyptpost.gov.eg/ar-eg//Home/EServices/Track-And-Trace">تتبع شحنتك</a> 
+            @if(isset($details['shipping']) && $details['shipping']->type == 'branch')
+                <p>تم شحن طلبك إلى الفرع الذي اخترته. سيتم جاهزًا للاستلام في غضون يومين</p>
+                <p>
+                    لمتابعة شحنتك حتى وصولها للفرع 
+                    انسخ البار كود دا {{ $details['barcode'] }}
+                </p>
+            @else
+                <p>الشحنة بتاخد من يومين الى خمس ايام عمل عشان توصلك سواء شحنت لأقرب مكتب بريد أو لحد البيت</p>
+                <p>
+                    لمتابعة شحنتك حتى وصولها مكتب البريد 
+                    انسخ البار كود دا {{ $details['barcode'] }}
+                </p>
+            @endif
+            <a style="background-color: #007bff; color: white; padding: 15px 20px; border-radius: 10px; text-decoration: none; display: block;text-align: center;" href="https://egyptpost.gov.eg/ar-eg//Home/EServices/Track-And-Trace">تتبع شحنتك</a> 
             <p>
                 لو محتاج تستفسر عن اسئلة تانية تقدر تشوف صفحة الاسئلة الشائعة <a style="color: #007bff; text-decoration: none;font-weight: bold;" href="{{ env('APP_URL') . "/ar/fqa"}}">من هنا</a>
             </p>
-            <h6>High Academy Store</h6>
+            <h4>High Academy Store</h4>
         </div>
     </body>
 </html>
