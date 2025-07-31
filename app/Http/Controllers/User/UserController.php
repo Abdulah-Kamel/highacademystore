@@ -36,10 +36,12 @@ class UserController extends Controller
     {
         $sliders = Slider::with('translations')->get();
         $products = Product::with('translations')
+            ->where("state", true)
             ->where('is_deleted', false) // ✅ Hide deleted products
             ->orderBy('created_at', 'desc')->take(8)->get();
 
         $mostOrderedProducts = Product::with('translations')
+            ->where("state", true)
             ->where('products.best_seller', 1)
             ->where('is_deleted', false) // ✅ Hide deleted products
             ->orderBy('created_at', 'desc')->take(8)->get();
@@ -78,7 +80,6 @@ class UserController extends Controller
         }
 
         $products = Product::with('translations')
-            ->where('is_deleted', false) // ✅ Hide deleted products
             ->when($request->category_id, fn($q) => $q->where('category_id', $request->category_id))
             ->when($request->title, fn($q) => $q->whereTranslationLike('name', '%' . $request->title . '%'))
             ->when($request->brand_id, fn($q) => $q->where('brand_id', $request->brand_id))
@@ -87,7 +88,9 @@ class UserController extends Controller
             ->when($request->main_category_id, fn($q) => $q->where('main_category_id', $request->main_category_id))
             ->when($request->size, fn($q) => $q->whereJsonContains('sizes', $request->size))
             ->when($request->color, fn($q) => $q->whereJsonContains('colors', $request->color))
-            ->orderBy('created_at', 'desc')->get();
+            ->orderBy('is_deleted', 'asc') // Show active products first
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
 
         $teachers = Brand::with('translations')->get();
         $categories = Category::with('translations')->get();

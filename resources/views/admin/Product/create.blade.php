@@ -3,7 +3,7 @@
     Create product
 @endsection
 @section('content')
-    <div class="col-lg-6 d-flex justify-content-center align-items-center">
+    <div class="col-lg-12 d-flex justify-content-center align-items-center">
         <div class="card shadow-sm w-100 p-4 p-md-5" style="max-width: 64rem;">
 
             <form id="form" class="row g-3 myform"
@@ -118,54 +118,47 @@
                 <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
 
-                {{-- <div class="col-12 d-none">
+                <div class="col-12">
                     <label class="form-label">have offer</label>
                     <select class="form-control show-tick ms select2 @error('have_offer') is-invalid @enderror"
-                        id="have_offer" data-validation="required" data-validation-required="required" name="have_offer"
-                        data-placeholder="Select">
+                            id="mySelect" name="have_offer" id="have_offer" data-validation="required"
+                            data-validation-required="required" data-placeholder="Select">
                         <option></option>
                         <option value="0">No</option>
-                        <option value="1" selected>Yes</option>
+                        <option value="1">Yes</option>
                     </select>
                 </div>
                 @error('have_offer')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
-                <div id="offer_fields" style="display: none;">
-                    <div class="col-12">
-                        <label class="form-label">offer type</label>
-                        <select class="form-control show-tick ms select2 @error('offer_type') is-invalid @enderror"
+
+                <div class="col-12">
+                    <label class="form-label">offer type</label>
+                    <select class="form-control show-tick ms select2 @error('offer_type') is-invalid @enderror"
                             name="offer_type" data-placeholder="Select" id="offer_type" data-validation="required"
                             data-validation-required="required">
-                            <option></option>
-                            <option value="percentage">percentage</option>
-                            <option value="value" selected>value</option>
-                        </select>
-                    </div>
-                    @error('offer_type')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                    <div class="col-12 mt-3">
-                        <label class="form-label">offer value</label>
-                        <input type="text" name="offer_value" value="0" id="offer_value" data-validation="required"
-                            data-validation-required="required"
-                            class="form-control form-control-lg @error('offer_value') is-invalid @enderror"
-                            placeholder="...">
-                    </div>
-                    @error('offer_value')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                        <option></option>
+                        <option value="percentage">percentage</option>
+                        <option value="value">value</option>
+                    </select>
                 </div>
-                <div class="col-12 mt-3">
-                    <label class="form-label">final price</label>
-                    <input type="text" name="final_price" id="final_price2" data-validation="required"
-                        data-validation-required="required"
-                        class="form-control form-control-lg @error('final_price') is-invalid @enderror" placeholder="...">
-                </div>
-                @error('final_price')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                @error('offer_type')
+                <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
-                <p id="final_price"></p> --}}
+
+                <div class="col-12" >
+                    <label class="form-label">offer value</label>
+                    <input type="text" name="offer_value" value="0" id="offer_value"
+                           data-validation="required" data-validation-required="required"
+                           class="form-control form-control-lg @error('offer_value') is-invalid @enderror"
+                           placeholder="...">
+                </div>
+                @error('offer_value')
+                <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+
+                <p id="final_price"></p>
+
                 <div class="col-12">
                     <label class="form-label">القسم</label>
                     <select class="form-control show-tick ms select2 @error('main_categories') is-invalid @enderror"
@@ -275,51 +268,14 @@
     </div>
 @endsection
 @section('js')
-    {{-- <script>
-        $('#category_id').change(function(e) {
-            var category_id = $(this).val();
-            var url = "{{ route('dashboard.getChildByParentID', ':id') }}";
-            url = url.replace(':id', category_id);
-
-            if (category_id != null) {
-                $.ajax({
-                    url: url,
-                    type: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        category_id: category_id,
-                    },
-                    success: function(response) {
-                        var html_option = "<option value=''>--- Child Category</option>";
-                        if (response.status) {
-                            $('#child_cat_div').removeClass('d-none');
-                            $.each(response.data, function(id, title) {
-                                html_option += "<option value='" + id + "'>" + title +
-                                    "</option>"
-                            });
-                        } else {
-                            $('#child_cat_div').addClass('d-none');
-                        }
-                        $('#child_cat_id').html(html_option);
-                    },
-                });
-            };
-        });
-    </script>
     <script>
-        var selectElement = document.getElementById("have_offer");
-        var offer_fields = document.getElementById("offer_fields");
+        $(document).ready(function () {
+            let main_categories = @json($main_categories);
+            console.log(main_categories);
+        });
 
-        selectElement.onchange = function() {
-            if (selectElement.value === "1") {
-                offer_fields.style.display = "block";
-            } else {
-                $('#offer_value').val(0);
-                offer_fields.style.display = "none";
-            }
-        }
 
-        /* change price */
+        // Price calculation - exactly like edit page
         var priceInput = document.getElementById("price");
         var offerTypeSelect = document.getElementById("offer_type");
         var offerValueInput = document.getElementById("offer_value");
@@ -336,25 +292,17 @@
                 finalPrice = price - offerValue;
             }
             finalPriceParagraph.textContent = "Final Price: " + finalPrice;
-            $('#final_price2').val(finalPrice);
         }
+
         offerTypeSelect.addEventListener("change", calculateFinalPrice);
         priceInput.addEventListener("input", calculateFinalPrice);
         offerValueInput.addEventListener("input", calculateFinalPrice);
-    </script> --}}
-
-    <script>
-        $(document).ready(function () {
-            let main_categories = @json($main_categories);
-            console.log(main_categories);
-        });
 
         $.validate({
             form: 'form'
         });
+
         $(document).ready(function () {
-
-
             $('#form').submit(function (e) {
                 e.preventDefault();
 
@@ -388,7 +336,6 @@
                     }
                 });
             });
-
         });
     </script>
 @endsection

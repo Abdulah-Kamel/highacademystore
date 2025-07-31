@@ -27,7 +27,7 @@
                                 @if (request('main_category_id') != 13)
                                     <div class="col-sm-6">
                                         <select name="main_category_id" class="form-select dropdown btn-lg rounded-pill"
-                                            id="stage-select"
+                                            id="main-category-select"
                                             style="margin-bottom: 5px; border:1px solid #ffd700; text-align:left">
                                             <option value="">القسم</option>
                                             @foreach ($main_categories as $main_category)
@@ -57,7 +57,8 @@
                                     <div class="col-sm-6">
                                         <select name="slider_id" class="form-select dropdown btn-lg rounded-pill"
                                             id="slider-select"
-                                            style="margin-bottom: 5px; border:1px solid #ffd700; text-align:left">
+                                            style="margin-bottom: 5px; border:1px solid #ffd700; text-align:left"
+                                            {{ !request('stage_id') ? 'disabled' : '' }}>
                                             <option value="">الصف الدراسي</option>
                                             @foreach ($sliders as $slider)
                                                 <option value="{{ $slider->id }}"
@@ -103,7 +104,6 @@
                         </div>
                     </form>
 
-
                     {{--
                     </div> --}}
                     {{--
@@ -111,6 +111,11 @@
                 </div>
                 <div class="row pb-3 g-5">
                     @include('user.layouts.product')
+                </div>
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-center mt-4">
+                        {{ $products->appends(request()->query())->links() }}
+                    </div>
                 </div>
             </div>
             <!-- Shop Product End -->
@@ -124,19 +129,46 @@
         document.addEventListener('DOMContentLoaded', function() {
             const stageSelect = document.getElementById('stage-select');
             const sliderSelect = document.getElementById('slider-select');
+            
+            // Store all slider options for filtering
             const allSliders = Array.from(sliderSelect.options);
 
+            // Function to filter sliders based on selected stage
+            function filterSliders(selectedStageId) {
+                // Clear current options except the first one
+                sliderSelect.innerHTML = '<option value="">الصف الدراسي</option>';
+                
+                if (selectedStageId) {
+                    // Enable slider select
+                    sliderSelect.disabled = false;
+                    
+                    // Filter and add matching sliders
+                    const filteredSliders = allSliders.filter(option => 
+                        option.dataset.stageId === selectedStageId
+                    );
+                    filteredSliders.forEach(option => {
+                        sliderSelect.appendChild(option.cloneNode(true));
+                    });
+                } else {
+                    // Disable slider select when no stage is selected
+                    sliderSelect.disabled = true;
+                    sliderSelect.value = '';
+                }
+            }
+
+            // Handle stage selection change
             stageSelect.addEventListener('change', function() {
                 const selectedStageId = this.value;
-                sliderSelect.innerHTML =
-                    '<option value="">الصف الدراسي</option>'; // Reset the slider options
-
-                if (selectedStageId) {
-                    const filteredSliders = allSliders.filter(option => option.dataset.stageId ===
-                        selectedStageId);
-                    filteredSliders.forEach(option => sliderSelect.appendChild(option));
-                }
+                filterSliders(selectedStageId);
             });
+
+            // Initialize on page load
+            const initialStageId = stageSelect.value;
+            if (initialStageId) {
+                filterSliders(initialStageId);
+            } else {
+                sliderSelect.disabled = true;
+            }
         });
     </script>
 @endsection
