@@ -57,10 +57,8 @@
                 <div class="col-12">
                     <label for="best_seller">Best Seller</label>
                     <select name="best_seller" id="best_seller" class="form-control">
-                        <option value="0" {{ isset($product) && $product->best_seller == 0 ? 'selected' : '' }}>No
-                        </option>
-                        <option value="1" {{ isset($product) && $product->best_seller == 1 ? 'selected' : '' }}>Yes
-                        </option>
+                        <option value="0" selected>No</option>
+                        <option value="1">Yes</option>
                     </select>
                 </div>
                 @error('best_seller')
@@ -121,10 +119,8 @@
                 <div class="col-12">
                     <label class="form-label">have offer</label>
                     <select class="form-control show-tick ms select2 @error('have_offer') is-invalid @enderror"
-                            id="mySelect" name="have_offer" id="have_offer" data-validation="required"
-                            data-validation-required="required" data-placeholder="Select">
-                        <option></option>
-                        <option value="0">No</option>
+                            id="mySelect" name="have_offer" id="have_offer" data-placeholder="Select">
+                        <option value="0" {{ isset($product) && $product->have_offer == 0 ? 'selected' : '' }}>No</option>
                         <option value="1">Yes</option>
                     </select>
                 </div>
@@ -135,8 +131,7 @@
                 <div class="col-12">
                     <label class="form-label">offer type</label>
                     <select class="form-control show-tick ms select2 @error('offer_type') is-invalid @enderror"
-                            name="offer_type" data-placeholder="Select" id="offer_type" data-validation="required"
-                            data-validation-required="required">
+                            name="offer_type" data-placeholder="Select" id="offer_type">
                         <option></option>
                         <option value="percentage">percentage</option>
                         <option value="value">value</option>
@@ -149,7 +144,6 @@
                 <div class="col-12" >
                     <label class="form-label">offer value</label>
                     <input type="text" name="offer_value" value="0" id="offer_value"
-                           data-validation="required" data-validation-required="required"
                            class="form-control form-control-lg @error('offer_value') is-invalid @enderror"
                            placeholder="...">
                 </div>

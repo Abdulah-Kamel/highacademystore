@@ -111,4 +111,6 @@ Route::post("pay/cards", [CheckoutController::class, "cards_pay"])->middleware('
 Route::post("pay/fawry", [CheckoutController::class, "fawry_pay"])->middleware('auth')->name("fawry.pay");
 Route::post("pay/fawry/wallet", [CheckoutController::class, "fawry_pay_wallet"])->middleware('auth')->name("fawry.wallet.pay");
 
+Route::post("fawry/webhook", [PaymentController::class, "fawry_webhook"])->name("fawry.webhook");
+
 Route::get("cronjob", [PaymentController::class, 'cronjob']);

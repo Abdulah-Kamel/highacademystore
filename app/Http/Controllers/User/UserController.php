@@ -36,12 +36,12 @@ class UserController extends Controller
     {
         $sliders = Slider::with('translations')->get();
         $products = Product::with('translations')
-            ->where("state", true)
+            ->whereIn("state", [1, 2])
             ->where('is_deleted', false) // ✅ Hide deleted products
             ->orderBy('created_at', 'desc')->take(8)->get();
 
         $mostOrderedProducts = Product::with('translations')
-            ->where("state", true)
+            ->whereIn("state", [1, 2])
             ->where('products.best_seller', 1)
             ->where('is_deleted', false) // ✅ Hide deleted products
             ->orderBy('created_at', 'desc')->take(8)->get();
@@ -90,7 +90,8 @@ class UserController extends Controller
             ->when($request->color, fn($q) => $q->whereJsonContains('colors', $request->color))
             ->orderBy('is_deleted', 'asc') // Show active products first
             ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->paginate(15)
+            ->onEachSide(0);
 
         $teachers = Brand::with('translations')->get();
         $categories = Category::with('translations')->get();

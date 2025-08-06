@@ -29,36 +29,6 @@
                     @enderror
                 </div>
 
-                {{-- Discount Type --}}
-                <div class="col-12">
-                    <label class="form-label">نوع الخصم</label>
-                    <select name="type" class="form-control @error('type') is-invalid @enderror">
-                        <option value="percentage" {{ $offer->type == 'percentage' ? 'selected' : '' }}>نسبة مئوية (%)</option>
-                        <option value="fixed" {{ $offer->type == 'fixed' ? 'selected' : '' }}>قيمة ثابتة (جنيه)</option>
-                    </select>
-                    @error('type')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Discount Value --}}
-                <div class="col-12">
-                    <label class="form-label">قيمة الخصم</label>
-                    <input type="number" name="value" class="form-control @error('value') is-invalid @enderror" value="{{ $offer->value }}">
-                    @error('value')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Minimum Books Required --}}
-                <div class="col-12">
-                    <label class="form-label">عدد الكتب الأدنى لتطبيق العرض</label>
-                    <input type="number" name="minimum_books" class="form-control @error('minimum_books') is-invalid @enderror" value="{{ $offer->minimum_books }}">
-                    @error('minimum_books')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
                 {{-- Submit Button --}}
                 <div class="col-12 text-center mt-4">
                     <button type="submit" class="btn btn-lg btn-block btn-dark lift text-uppercase">تحديث العرض</button>

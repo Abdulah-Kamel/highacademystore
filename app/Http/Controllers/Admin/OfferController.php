@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\OfferService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class OfferController extends Controller
@@ -23,24 +24,87 @@ class OfferController extends Controller
 
     public function datatable()
     {
-        $offers = $this->offerService->getAllOffers();
-        $offers = $offers->reverse();
-        return DataTables::of($offers)
-            ->addColumn('image', function ($row) {
-                $imagePath = asset('storage/images/offers/' . $row->image);
-                return '<img src="' . $imagePath . '" alt="offer-image" style="height:120px;width:150px" class="avatar rounded me-2">';
-            })
-            ->addColumn('discount_details', function ($row) {
-                return $row->type === 'percentage' 
-                    ? "{$row->value}% Discount on {$row->minimum_books}+ Books" 
-                    : "{$row->value} EGP Discount on {$row->minimum_books}+ Books";
-            })
-            ->addColumn('operation', function ($row) {
-                return '<a href="' . route('dashboard.offers.edit', $row->id) . '" class="btn btn-success btn-sm">Edit</a>
-                        <button type="button" class="btn btn-danger btn-sm delete_btn" data-id="' . $row->id . '">Delete</button>';
-            })
-            ->rawColumns(['image', 'operation'])
-            ->toJson();
+        try {
+            // Log the incoming request
+            Log::info('=== DATATABLE REQUEST ===');
+            
+            // Get the draw parameter (required by DataTables)
+            $draw = request()->input('draw', 1);
+            
+            // Get all offers
+            $offers = $this->offerService->getAllOffers();
+            
+            // Log the count of offers
+            Log::info('Number of offers found: ' . $offers->count());
+            
+            // Prepare the data array for DataTables
+            $data = [];
+            
+            foreach ($offers as $offer) {
+                // Create the image URL
+                $imageUrl = $offer->image ? asset('storage/images/offers/' . $offer->image) : null;
+                
+                // Create the image HTML
+                $imageHtml = $imageUrl 
+                    ? '<img src="' . $imageUrl . '" alt="offer-image" style="height:120px;width:150px" class="avatar rounded me-2">' 
+                    : 'No Image';
+                
+                // Create the action buttons
+                $actionButtons = 
+                    '<a href="' . route('dashboard.offers.edit', $offer->id) . '" class="btn btn-success btn-sm">Edit</a> ' .
+                    '<button type="button" class="btn btn-danger btn-sm delete_btn" data-id="' . $offer->id . '">Delete</button>';
+                
+                // Add the offer data to the data array
+                $data[] = [
+                    'id' => $offer->id,
+                    'image' => $imageHtml,
+                    'operation' => $actionButtons
+                ];
+            }
+            
+            // Prepare the response
+            $response = [
+                'draw' => (int) $draw,
+                'recordsTotal' => $offers->count(),
+                'recordsFiltered' => $offers->count(),
+                'data' => $data
+            ];
+            
+            Log::info('Sending DataTables response', [
+                'draw' => $draw,
+                'records' => $offers->count(),
+                'data_count' => count($data)
+            ]);
+            
+            return response()->json($response);
+            
+        } catch (\Exception $e) {
+            $authUser = auth('admin')->user();
+            $errorData = [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request' => request()->all(),
+                'auth_user' => $authUser ? [
+                    'id' => $authUser->id,
+                    'name' => $authUser->name,
+                    'email' => $authUser->email,
+                    // Add other relevant user fields as needed
+                ] : null
+            ];
+            
+            Log::error('DATATABLE ERROR:', $errorData);
+            
+            return response()->json([
+                'draw' => (int) request()->input('draw', 1),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'error' => 'An error occurred while loading the data.',
+                'debug' => config('app.debug') ? $errorData : null
+            ], 500);
+        }
     }
 
     public function create()
@@ -53,16 +117,13 @@ class OfferController extends Controller
         try {
             // Validate request
             $data = $request->validate([
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'type' => 'required|in:percentage,fixed',
-                'value' => 'required|numeric|min:0',
-                'minimum_books' => 'required|integer|min:1'
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
             ]);
 
             // Store offer
             $this->offerService->storeOffer($request);
 
-            return response()->json(['message' => 'Offer created successfully!'], 200);
+            return response()->json(['message' => 'تم إضافة العرض بنجاح'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -78,16 +139,13 @@ class OfferController extends Controller
         try {
             // Validate request
             $data = $request->validate([
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'type' => 'required|in:percentage,fixed',
-                'value' => 'required|numeric|min:0',
-                'minimum_books' => 'required|integer|min:1'
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
             ]);
 
             // Update offer
             $this->offerService->updateOffer($request, $id);
 
-            return response()->json(['message' => 'Offer updated successfully!'], 200);
+            return response()->json(['message' => 'تم تحديث العرض بنجاح'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

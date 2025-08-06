@@ -8,7 +8,9 @@
     <meta name="description" content="Responsive Bootstrap 5 admin dashboard template & web App ui kit.">
     <meta name="keyword"
         content="LUNO, Bootstrap 5, ReactJs, Angular, Laravel, VueJs, ASP .Net, Admin Dashboard, Admin Theme, HRMS, Projects, Hospital Admin, CRM Admin, Events, Fitness, Music, Inventory, Job Portal">
-        <title>@yield('title')</title>
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title')</title>
     @include('admin.includs.css')
 </head>
 

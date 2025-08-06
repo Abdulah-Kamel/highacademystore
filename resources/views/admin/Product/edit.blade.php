@@ -155,8 +155,7 @@
                 <div class="col-12" style="display: none" id="myHiddenElement1">
                     <label class="form-label">offer type</label>
                     <select class="form-control show-tick ms select2 @error('offer_type') is-invalid @enderror"
-                            name="offer_type" data-placeholder="Select" id="offer_type" data-validation="required"
-                            data-validation-required="required">
+                            name="offer_type" data-placeholder="Select" id="offer_type">
                         <option></option>
                         <option value="percentage" {{ $product->offer_type == 'percentage' ? 'selected' : '' }}>
                             percentage
@@ -170,7 +169,6 @@
                 <div class="col-12" style="display: none" id="myHiddenElement2">
                     <label class="form-label">offer value</label>
                     <input type="text" name="offer_value" value="{{ $product->offer_value }}" id="offer_value"
-                           data-validation="required" data-validation-required="required"
                            class="form-control form-control-lg @error('offer_value') is-invalid @enderror"
                            placeholder="...">
                 </div>

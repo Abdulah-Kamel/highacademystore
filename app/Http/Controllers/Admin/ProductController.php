@@ -162,7 +162,7 @@ class ProductController extends Controller
         try {
             $data = $request->only('name:ar', 'name:en', 'slider_id', "short_name", 'commit', 'description:ar', 'description:en', 'quantity', 'price', "tax", "slowTax", 'final_price', 'main_category_id', 'category_id', 'child_cat_id', 'brand_id', 'offer_type', 'offer_value', 'have_offer', 'sizes', 'colors', 'max_qty_for_order');
             // Handle best_seller field
-            $data['best_seller'] = $request->has('best_seller') ? 1 : 0;
+            $data['best_seller'] = $request->input('best_seller', 0); // Default to 0 if not provided
 
             $product = $this->productService->save($request, $data);
 

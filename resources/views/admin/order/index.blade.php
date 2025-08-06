@@ -236,7 +236,7 @@
                     },
                     {
                         data: 'phone',
-                        name: 'phone'
+                        name: 'mobile'
                     },
                     {
                         data: 'address',

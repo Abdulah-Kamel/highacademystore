@@ -225,95 +225,98 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // 2) احتساب الشحن والعنوان (كما في calcShipping)
-        [$addressStr, $delivery] = $this->calcShipping($request);
+        try {
+            DB::beginTransaction();
 
-        // 3) احسب المبلغ الصافي وقيمة الدفع النهائية (مع 1% + 2.5 ثابت)
-        $amount = array_sum(array_map(fn($v) => str_replace(',', '', $v), $request->total_price));
-        $total  = $amount + $delivery;
-        $total  = max($total - session('applied_discount.amount', 0), 0);
+            // 2) احتساب الشحن والعنوان (كما في calcShipping)
+            [$addressStr, $delivery] = $this->calcShipping($request);
 
-        $amount_to_pay = $total + ($total * 0.01) + 2.5;
+            // 3) احسب المبلغ الصافي وقيمة الدفع النهائية (مع 1% + 2.5 ثابت)
+            $amount = array_sum(array_map(fn($v) => str_replace(',', '', $v), $request->total_price));
+            $total  = $amount + $delivery;
+            $total  = max($total - session('applied_discount.amount', 0), 0);
 
-        // 4) أنشئ الـ Order بنفس حقول القديم
-        $order = new Order();
-        $order->user_id = auth()->user()->id;
-        $order->date = now();
-        $order->status = "new";
-        $order->method = "Fawry Pay";
-        $order->code = Str::upper("#" . Str::random(8));
-        $order->address = $addressStr;
-        $order->address2 = $request->address;
-        $order->amount = $amount;
-        $order->delivery_fee = $delivery;
-        $order->name = $request->user_name;
-        $order->mobile = $request->mobile;
-        $order->temp_mobile = $request->temp_mobile;
-        $order->total = $total;
-        $order->near_post = $request->near_post ?? null;
-        $order->shipping_method = $request->shipping_method;
-        $order->save();
-
-
-        // 5) تفاصيل الطلب
-        foreach ($request->product_id as $i => $pid) {
-            OrderDetail::create([
-                'order_id'    => $order->id,
-                'product_id'  => $pid,
-                'amout'       => $request->amount[$i],
-                'size'        => $request->size[$i]  ?? null,
-                'color'       => $request->color[$i] ?? null,
-                'price'       => str_replace(',', '', $request->price[$i]),
-                'total_price' => str_replace(',', '', $request->total_price[$i]),
-            ]);
-        }
-
-        // 6) بناء وإرسال رابط الدفع عبر createLink (من القديم)
-        $amount_to_pay = $order->total + ($order->total * 0.01) + 2.5;
-
-        $currentDateTime = Carbon::now();
-        $futureDateTime = $currentDateTime->addHours(4);
-        $futureTimestamp = $futureDateTime->timestamp * 1000;
-        $response = $this->createLink(
-            $amount_to_pay,
-            $order->users->id,
-            $order->name,
-            $order->users->email,
-            $order->mobile,
-            "PayAtFawry",       // e.g. "PayAtFawry" من config
-            $order->id,
-            $futureTimestamp,
-            route("verify-payment")
-        );
-
-        // Fallback for the old (and likely incorrect for this flow) redirect behavior.
-        if (isset($response['code']) && $response['code'] === '200' && isset($response['link'])) {
-            $order->payment_id = $response['payment_id'];
-            $order->account    = $response['payment_id'];
+            // 4) أنشئ الـ Order بنفس حقول القديم
+            $order = new Order();
+            $order->user_id = auth()->user()->id;
+            $order->date = now();
+            $order->status = "new";
+            $order->method = "Fawry Pay";
+            $order->code = Str::upper("#" . Str::random(8));
+            $order->address = $addressStr;
+            $order->address2 = $request->address;
+            $order->amount = $amount;
+            $order->delivery_fee = $delivery;
+            $order->name = $request->user_name;
+            $order->mobile = $request->mobile;
+            $order->temp_mobile = $request->temp_mobile;
+            $order->total = $total;
+            $order->near_post = $request->near_post ?? null;
+            $order->shipping_method = $request->shipping_method;
             $order->save();
-            Cart::instance('shopping')->destroy();
-            session()->forget('applied_discount');
-            DB::commit();
-            return response()->json([
-                'success' => true,
-                'code' => 200,
-                'url' => $response['link']
-            ], 200);
-        } else {
-            return response()->json([
-                "success" => false,
-                "code" => 400,
-                "msg" => "خطأ اثناء الدفع",
-            ], 400);
-        }
 
-        DB::rollBack();
-        return response()->json([
-            'success' => false,
-            'code' => 400,
-            'msg' => 'خطأ اثناء الدفع',
-            'info' => $response
-        ], 400);
+
+            // 5) تفاصيل الطلب
+            foreach ($request->product_id as $i => $pid) {
+                OrderDetail::create([
+                    'order_id'    => $order->id,
+                    'product_id'  => $pid,
+                    'amout'       => $request->amount[$i],
+                    'size'        => $request->size[$i]  ?? null,
+                    'color'       => $request->color[$i] ?? null,
+                    'price'       => str_replace(',', '', $request->price[$i]),
+                    'total_price' => str_replace(',', '', $request->total_price[$i]),
+                ]);
+            }
+
+            // 6) بناء وإرسال رابط الدفع عبر createLink (من القديم)
+            $amount_to_pay = $order->total + ($order->total * 0.01) + 2.5;
+
+            $currentDateTime = Carbon::now();
+            $futureDateTime = $currentDateTime->addHours(4);
+            $futureTimestamp = $futureDateTime->timestamp * 1000;
+            $response = $this->createLink(
+                $amount_to_pay,
+                $order->users->id,
+                $order->name,
+                $order->users->email,
+                $order->mobile,
+                "PayAtFawry",       // e.g. "PayAtFawry" من config
+                $order->id,
+                $futureTimestamp,
+                route("verify-payment")
+            );
+
+            if (isset($response['code']) && $response['code'] === '200' && isset($response['link'])) {
+                $order->payment_id = $response['payment_id'];
+                $order->account    = $response['payment_id'];
+                $order->save();
+                Cart::instance('shopping')->destroy();
+                session()->forget('applied_discount');
+                DB::commit();
+                return response()->json([
+                    'success' => true,
+                    'code' => 200,
+                    'url' => $response['link']
+                ], 200);
+            } else {
+                DB::rollBack();
+                return response()->json([
+                    "success" => false,
+                    "code" => 400,
+                    "msg" => "خطأ اثناء الدفع",
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e);
+            return response()->json([
+                'success' => false,
+                'code' => 500,
+                'msg' => 'خطأ اثناء الدفع',
+                'info' => $e->getMessage()
+            ], 500);
+        }
     }
 
 

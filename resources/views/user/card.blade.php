@@ -442,6 +442,8 @@ $discountAmount = session()->has('applied_discount')
 
             function setupPaymentHandler(buttonId, routeUrl, extraFormId = null) {
                 $(buttonId).click(function() {
+                    const btn = $(this);
+                    btn.prop('disabled', true).text('جاري المعالجة...');
 
                     const selectedMethod = shippingMethods
                         .find(m => m.id == shippingSelect.value);
@@ -497,7 +499,6 @@ $discountAmount = session()->has('applied_discount')
                             if (response.url) {
                                 window.location.href = response.url;
                             } else if (response.success) {
-                                enablebtn(buttonId);
                                 Swal.fire({
                                     icon: 'success',
                                     title: response.msg,
@@ -507,7 +508,7 @@ $discountAmount = session()->has('applied_discount')
                                     window.location.href = '/';
                                 }, 500);
                             } else {
-                                enablebtn(buttonId);
+                                btn.prop('disabled', false).text('إعادة المحاولة');
                                 Swal.fire({
                                     icon: 'error',
                                     title: response.msg || 'An unknown error occurred.',
@@ -516,6 +517,7 @@ $discountAmount = session()->has('applied_discount')
                             }
                         },
                         error: function(jqXHR) {
+                            btn.prop('disabled', false).text('إعادة المحاولة');
                             var errorMessage = jqXHR.responseJSON && jqXHR.responseJSON.msg ?
                                 jqXHR.responseJSON.msg :
                                 'خطا اثناء التنفيذ';

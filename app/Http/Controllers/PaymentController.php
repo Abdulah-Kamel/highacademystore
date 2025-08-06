@@ -139,15 +139,9 @@ class PaymentController extends Controller
             }
             $order->status = $hasReservedProduct ? "reserved" : "success";
             $order->tracker = "shipped"; // second stage
-            $details = [
-                'id' => $order->id,
-                'name' => $order->name,
-                'shipping' => $order->is_fastDelivery == 0 ? "شحن لاقرب مكتب بريد" : "home",
-            ];
-            Mail::to($order->user->email)->send(new successPaid($details));
+            Mail::to($order->user->email)->send(new successPaid($order));
             $order->save();
         } elseif ($request->orderStatus == "UNPAID") {
-            dd($order);
             $order->is_paid = 2;
             $order->status = "cancelled";
             $order->response = $jsonText;

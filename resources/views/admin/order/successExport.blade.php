@@ -146,9 +146,15 @@ function reverseWords($string)
                                     التجارة
                                 </p>
                                 <br />
+                                @if($order->shipping_method == 2)
                                 <p><b>نوع الشحن</b>:
-                                    {{ optional($order->shipping)->name }}
+                                    <span style="color: red;">البريد السريع</span>
                                 </p>
+                                @else
+                                <p><b>نوع الشحن</b>:
+                                    <span>{{ optional($order->shipping)->name }}</span>
+                                </p>
+                                @endif
 
                                 <br />
                                 <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">رقم

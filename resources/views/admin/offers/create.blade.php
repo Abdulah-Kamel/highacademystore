@@ -15,39 +15,9 @@
 
                 {{-- Offer Image --}}
                 <div class="col-12">
-                    <label class="form-label">الصورة</label>
-                    <input type="file" name="image" accept="image/*" class="dropify @error('image') is-invalid @enderror">
+                    <label class="form-label">صورة العرض</label>
+                    <input type="file" name="image" accept="image/*" class="dropify @error('image') is-invalid @enderror" required>
                     @error('image')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Discount Type --}}
-                <div class="col-12">
-                    <label class="form-label">نوع الخصم</label>
-                    <select name="type" id="discountType" class="form-control @error('type') is-invalid @enderror" required>
-                        <option value="percentage">نسبة مئوية (%)</option>
-                        <option value="fixed">مبلغ ثابت (EGP)</option>
-                    </select>
-                    @error('type')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Discount Value --}}
-                <div class="col-12">
-                    <label class="form-label">قيمة الخصم</label>
-                    <input type="number" name="value" id="discountValue" class="form-control @error('value') is-invalid @enderror" required min="1" placeholder="أدخل قيمة الخصم">
-                    @error('value')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Minimum Books for Offer --}}
-                <div class="col-12">
-                    <label class="form-label">عدد الكتب المطلوب للحصول على الخصم</label>
-                    <input type="number" name="minimum_books" class="form-control @error('minimum_books') is-invalid @enderror" required min="1" placeholder="أدخل عدد الكتب المطلوبة">
-                    @error('minimum_books')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

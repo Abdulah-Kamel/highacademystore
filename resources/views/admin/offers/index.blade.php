@@ -4,19 +4,16 @@
 @section('content')
     <div class="card">
         <div class="card-header">
-            <h4>Offers List</h4>
-            <a href="{{ route('dashboard.create.offers') }}" class="btn btn-primary">Add New Offer</a>
+            <h4>قائمة العروض</h4>
+            <a href="{{ route('dashboard.create.offers') }}" class="btn btn-primary">إضافة عرض جديد</a>
         </div>
         <div class="card-body">
             <table class="table" id="offersTable">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Image</th>
-                        <th>Discount Type</th>
-                        <th>Discount Value</th>
-                        <th>Min Books</th>
-                        <th>Actions</th>
+                        <th>الصورة</th>
+                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -28,17 +25,88 @@
 @section('js')
 <script>
 $(document).ready(function() {
+    // Set up CSRF token for AJAX requests
+    $(function() {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    });
+
+    // Log DataTable initialization
+    console.log('Initializing DataTable...');
+    
     const table = $('#offersTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('dashboard.offers.datatable') }}",
+        ajax: {
+            url: "{{ route('dashboard.offers.datatable') }}",
+            type: 'GET',
+            dataType: 'json',
+            data: function(d) {
+                // Add any additional parameters here if needed
+                console.log('Sending request to server with parameters:', d);
+            },
+            dataSrc: function(json) {
+                console.log('Received response from server:', json);
+                return json.data;
+            },
+            error: function(xhr, error, thrown) {
+                console.group('DataTables Error');
+                console.error('Status:', xhr.status);
+                console.error('Error:', error);
+                console.error('Thrown:', thrown);
+                console.error('Response:', xhr.responseText);
+                console.groupEnd();
+                
+                if (xhr.status === 401) {
+                    // Redirect to login if unauthorized
+                    window.location.href = '{{ route("login") }}';
+                } else {
+                    // Show error message
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while loading the data. Please check the console for details.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
+        },
         columns: [
-            { data: 'id', name: 'id' },
-            { data: 'image', name: 'image', orderable: false, searchable: false },
-            { data: 'type', name: 'type' },  // ✅ Show Discount Type
-            { data: 'value', name: 'value' }, // ✅ Show Discount Value
-            { data: 'minimum_books', name: 'minimum_books' }, // ✅ Show Min Books Required
-            { data: 'operation', name: 'operation', orderable: false, searchable: false }
+            { 
+                data: 'id', 
+                name: 'id',
+                searchable: true,
+                className: 'text-center'
+            },
+            { 
+                data: 'image', 
+                name: 'image', 
+                orderable: false, 
+                searchable: false,
+                className: 'text-center',
+                render: function(data, type, row) {
+                    if (type === 'display') {
+                        return data || '<span class="text-muted">No Image</span>';
+                    }
+                    return data;
+                }
+            },
+            { 
+                data: 'operation', 
+                name: 'operation', 
+                orderable: false, 
+                searchable: false,
+                className: 'text-center',
+                render: function(data, type, row) {
+                    if (type === 'display') {
+                        return data || '';
+                    }
+                    return data;
+                }
+            }
         ]
     });
 
@@ -74,6 +142,7 @@ $(document).ready(function() {
             }
         });
     });
+    
 });
 </script>
 @endsection

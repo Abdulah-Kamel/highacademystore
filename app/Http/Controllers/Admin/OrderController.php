@@ -319,9 +319,7 @@ class OrderController extends Controller
 
         $query = Order::with(['orderDetails.products', 'shipping'])->latest();
 
-        if ($status) {
-            $query->where('status', $status);
-        }
+        $query->whereIn('status', ['success', 'reserved']);
 
         if ($shipping) {
             $query->where('shipping_method', $shipping);
