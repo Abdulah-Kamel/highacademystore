@@ -86,16 +86,8 @@ class CartController extends Controller
                 ]);
             }
 
-            // [ADDED] Check if total exceeds 30
-            if ($newQuantity > $object_product->max_qty_for_order) {
-                return response()->json([
-                    'status' => false,
-                    'message' => "عفوا، لا يمكنك إضافة أكثر من {$object_product->max_qty_for_order} لهذا المنتج.",
-                ]);
-            }
-
             // Ensure Stock is Available
-            if ($product[0]['quantity'] < $newQuantity) {
+            if ($product[0]['quantity'] < $product_qty) {
                 return response()->json([
                     'status' => false,
                     'message' => "لا توجد هذه الكمية من هذا العنصر، الكمية المتاحة هي " . $product[0]['quantity']
@@ -103,6 +95,14 @@ class CartController extends Controller
             }
 
             Cart::instance('shopping')->update($existingCartItem->rowId, $newQuantity);
+
+            // Deduct only the additional quantity being added
+            $product_quantity = Product::find($product_id);
+            if ($product_quantity->state != 2) {
+                $product_quantity->quantity -= $product_qty;
+                $product_quantity->state = ($product_quantity->quantity > 0) ? 1 : 0;
+            }
+            $product_quantity->save();
         } else {
             $max_quantity = Product::find($product_id)->max_qty_for_order;
             // Add New Item to Cart
@@ -114,18 +114,15 @@ class CartController extends Controller
                 ['maxQuantity' => $max_quantity, 'size' => $request->size, 'color' => $request->color, 'added_at' => now()->timestamp]
             )
                 ->associate('App\Models\Product');
-        }
 
-        // Deduct Stock
-        $product_quantity = Product::find($product_id);
-        // التحقق إذا كانت الحالة تساوي 2 قبل إنقاص الكمية
-        if ($product_quantity->state != 2) {
-            $product_quantity->quantity -= $product_qty;
+            // Deduct Stock for new item
+            $product_quantity = Product::find($product_id);
+            if ($product_quantity->state != 2) {
+                $product_quantity->quantity -= $product_qty;
+                $product_quantity->state = ($product_quantity->quantity > 0) ? 1 : 0;
+            }
+            $product_quantity->save();
         }
-        if ($product_quantity->state != 2) {
-            $product_quantity->state = ($product_quantity->quantity > 0) ? 1 : 0;
-        }
-        $product_quantity->save();
 
         // Response
         $response = [
