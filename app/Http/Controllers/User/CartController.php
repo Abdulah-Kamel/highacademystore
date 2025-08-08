@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Discount;
 use App\Models\Product;
 use App\Models\Session;
+use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 
@@ -18,6 +19,24 @@ class CartController extends Controller
      */
     public function index()
     {
+        $cart = Cart::instance('shopping')->content();
+        $expired = $cart->filter(function ($item) {
+            $addedAt = optional($item->options)->added_at;
+            return $addedAt && $addedAt < Carbon::now()->subMinutes(5)->timestamp;
+        });
+        foreach ($expired as $item) {
+            if ($product = Product::find(optional($item->model)->id)) {
+                // Always restore quantity even if state == 2 (atomic increment)
+                $product->increment('quantity', $item->qty);
+                // Only update state if not state 2
+                if ($product->state != 2) {
+                    $product->state = ($product->quantity > 0) ? 1 : 0;
+                    $product->save();
+                }
+            }
+            Cart::instance('shopping')->remove($item->rowId);
+        }
+
         return view('user.cart');
     }
 
@@ -98,8 +117,10 @@ class CartController extends Controller
 
             // Deduct only the additional quantity being added
             $product_quantity = Product::find($product_id);
+            // Always deduct quantity even if state == 2
+            $product_quantity->quantity -= $product_qty;
+            // Only update state if not state 2
             if ($product_quantity->state != 2) {
-                $product_quantity->quantity -= $product_qty;
                 $product_quantity->state = ($product_quantity->quantity > 0) ? 1 : 0;
             }
             $product_quantity->save();
@@ -117,8 +138,10 @@ class CartController extends Controller
 
             // Deduct Stock for new item
             $product_quantity = Product::find($product_id);
+            // Always deduct quantity even if state == 2
+            $product_quantity->quantity -= $product_qty;
+            // Only update state if not state 2
             if ($product_quantity->state != 2) {
-                $product_quantity->quantity -= $product_qty;
                 $product_quantity->state = ($product_quantity->quantity > 0) ? 1 : 0;
             }
             $product_quantity->save();
@@ -193,7 +216,7 @@ class CartController extends Controller
             $cart = Cart::instance('shopping')->get($rowId);
             $product = Product::find($cart->model->id);
 
-            if ($product->quantity < ($request_quantity - $cart->qty)) {
+            if ($product->state != 2 && $product->quantity < ($request_quantity - $cart->qty)) {
                 $response['status'] = false;
                 $response['message'] = "لا توجد هذه الكمية من هذا العنصر الكمية الموجوده هي" . $product->quantity;
                 return $response;

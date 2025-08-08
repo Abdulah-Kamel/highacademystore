@@ -156,18 +156,24 @@ class PaymentController extends Controller
         $orders = Order::where("tracker", "delivered")->where('updated_at', '<', Carbon::now()->subHours(48))->get();
         $cart = Cart::instance('shopping')->content();
         $expired_cart_items = $cart->filter(function ($item) {
-            if ($item->added_at == null) {
-                return;
+            // 'added_at' is stored in options when adding to cart
+            $addedAt = optional($item->options)->added_at;
+            if ($addedAt == null) {
+                return false;
             }
-            return $item->added_at < Carbon::now()->subHours(3);
+            // return $addedAt < Carbon::now()->subHours(3)->timestamp;
+            return $addedAt < Carbon::now()->subMinutes(5)->timestamp;
         });
 
         foreach ($expired_cart_items as $item) {
-            $product = Product::find($item->model->id);
-            $product->quantity = $product->quantity + $item->qty;
-            // $product->state = 1;
+            $product = Product::find(optional($item->model)->id);
+            if (!$product) {
+                continue;
+            }
+            // Atomic restore
+            $product->increment('quantity', $item->qty);
+            $product->state = ($product->quantity > 0) ? 1 : 0;
             $product->save();
-
             Cart::instance('shopping')->remove($item->rowId);
         }
 
@@ -175,14 +181,19 @@ class PaymentController extends Controller
 
         foreach ($fawry_orders as $o) {
             $order = Order::find($o->id);
+            if (!$order) {
+                continue;
+            }
             $order->status = "cancelled";
             $order->save();
             foreach ($order->orderDetails as $detail) {
                 $product = Product::find($detail->product_id);
-                $product->quantity = $product->quantity + $detail->amout;
-                if ($product->state == 0) {
-                    // $product->state = 1;
+                if (!$product) {
+                    continue;
                 }
+                $product->increment('quantity', $detail->amout);
+                // Update state based on quantity
+                $product->state = ($product->quantity > 0) ? 1 : 0;
                 $product->save();
             }
         }
@@ -194,14 +205,19 @@ class PaymentController extends Controller
 
         foreach ($fawryWallet_orders as $o) {
             $order = Order::find($o->id);
+            if (!$order) {
+                continue;
+            }
             $order->status = "cancelled";
             $order->save();
             foreach ($order->orderDetails as $detail) {
                 $product = Product::find($detail->product_id);
-                $product->quantity = $product->quantity + $detail->amout;
-                if ($product->state == 0) {
-                    // $product->state = 1;
+                if (!$product) {
+                    continue;
                 }
+                $product->increment('quantity', $detail->amout);
+                // Update state based on quantity
+                $product->state = ($product->quantity > 0) ? 1 : 0;
                 $product->save();
             }
         }
