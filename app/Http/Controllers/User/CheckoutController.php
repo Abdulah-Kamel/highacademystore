@@ -211,6 +211,7 @@ class CheckoutController extends Controller
             'city.required'        => 'برجاء اختيار المدينة',
             'address.required'     => 'برجاء ادخال العنوان التفصيلي',
             'user_name.required'   => 'برجاء ادخال الاسم',
+            'user_name.regex'      => 'يجب كتابة الاسم باللغة العربية',
             'mobile.required'      => 'برجاء ادخال رقم الموبايل',
             'mobile.digits'        => 'رقم الموبايل يجب أن يتكون من 11 رقمًا',
             'temp_mobile.required' => 'برجاء ادخال رقم الموبايل الاحتياطي',

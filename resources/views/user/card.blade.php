@@ -443,6 +443,7 @@ $discountAmount = session()->has('applied_discount')
             function setupPaymentHandler(buttonId, routeUrl, extraFormId = null) {
                 $(buttonId).click(function() {
                     const btn = $(this);
+                    const originalText = btn.text(); // Store original button text
                     btn.prop('disabled', true).text('جاري المعالجة...');
 
                     const selectedMethod = shippingMethods
@@ -457,6 +458,7 @@ $discountAmount = session()->has('applied_discount')
                             title: 'خطأ',
                             text: 'يرجى إدخال اسم أقرب مكتب بريد قبل المتابعة'
                         });
+                        btn.prop('disabled', false).text(originalText); // Restore original text
                         return; // abort
                     }
 
@@ -508,7 +510,7 @@ $discountAmount = session()->has('applied_discount')
                                     window.location.href = '/';
                                 }, 500);
                             } else {
-                                btn.prop('disabled', false).text('إعادة المحاولة');
+                                btn.prop('disabled', false).text(originalText); // Restore original text
                                 Swal.fire({
                                     icon: 'error',
                                     title: response.msg || 'An unknown error occurred.',
@@ -517,7 +519,7 @@ $discountAmount = session()->has('applied_discount')
                             }
                         },
                         error: function(jqXHR) {
-                            btn.prop('disabled', false).text('إعادة المحاولة');
+                            btn.prop('disabled', false).text(originalText); // Restore original text
                             var errorMessage = jqXHR.responseJSON && jqXHR.responseJSON.msg ?
                                 jqXHR.responseJSON.msg :
                                 'خطا اثناء التنفيذ';
