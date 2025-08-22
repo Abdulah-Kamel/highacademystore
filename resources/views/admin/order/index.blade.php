@@ -75,20 +75,6 @@
                     <!-- اختيار حالة الطلبات -->
 
 
-                    <div class="d-flex gap-2 w-100">
-                        <!-- زر تصدير الطلبات -->
-                        <a href="{{ route('dashboard.orders.export') }}?limit=10" id="export"
-                            class="btn btn-primary w-50">
-                            تصدير الطلبات
-                        </a>
-
-                        <!-- زر تصدير الطلبات بالتفاصيل -->
-                        <a href="{{ route('dashboard.orders.export.success') }}?limit=10" id="successExport"
-                            class="btn btn-primary w-50">
-                            تصدير الطلبات بالتفاصيل
-                        </a>
-                    </div>
-
                     <div class="d-flex gap-2 w-100 mt-2">
                         <!-- إدخال عدد الطلبات -->
                         <div class="input-group w-50">
@@ -105,6 +91,14 @@
                         </div>
                     </div>
                     <div class="w-100 mb-2">
+                        <label for="orderBranchLimit" class="form-label">تصدير طلبات الفروع</label>
+                        <div class="input-group">
+                            <input type="number" id="orderBranchLimit" class="form-control" 
+                                placeholder="عدد طلبات الفروع للتصدير" min="1" oninput="validateInput(this)">
+                            <button class="btn btn-info text-white" onclick="exportBranchOrders()">تصدير طلبات الفروع</button>
+                        </div>
+                    </div>
+                    <div class="w-100 mb-2">
                         <label for="orderStatus" class="form-label"> نوع الطلب</label>
                         <select id="orderStatus" class="form-select">
                             <option value="" disabled selected>اختر</option>
@@ -112,6 +106,7 @@
                             <option value="reserved">الطلبات المحجوزة</option>
                         </select>
                     </div>
+                    
                     <div class="w-100 mb-2">
                         <a href="#" onclick="confirmUpdateAllReversed()" class="form-control btn btn-danger">تحويل
                             جميع
@@ -200,7 +195,7 @@
                 if (result.isConfirmed) {
                     window.location.href = "{{ route('dashboard.update_all_reversed_order') }}";
                 }
-            });
+            });e
         }
 
         $(document).ready(function() {
@@ -298,7 +293,13 @@
                 }
 
                 $('#export').attr('href', baseExportUrl + '?' + params.toString());
-                $('#successExport').attr('href', baseSuccessExportUrl + '?' + params.toString());
+
+                // Disable success export if no specific state is selected
+                if (stateFilterValue) {
+                    $('#successExport').attr('href', baseSuccessExportUrl + '?' + params.toString()).removeClass('disabled');
+                } else {
+                    $('#successExport').attr('href', '#').addClass('disabled');
+                }
             }
 
             // Initial call
@@ -340,45 +341,69 @@
 
         function exportOrders() {
             let limit = document.getElementById("orderLimit").value || 10;
-            let status = $('#orderStatus').val() || '';
-            let shipping = window.getShippingFilterValue() || '';
+            let status = $('#orderStatus').val();
+
+            if (!status) {
+                Swal.fire({
+                    title: 'خطأ',
+                    text: 'يرجى تحديد نوع الطلب أولاً.',
+                    icon: 'error',
+                    confirmButtonText: 'حسنًا'
+                });
+                return;
+            }
 
             let url = new URL("{{ route('dashboard.orders.export') }}");
             url.searchParams.append('limit', limit);
-            if (status) {
-                url.searchParams.append('status', status);
-            }
-            if (shipping) {
-                url.searchParams.append('shipping', shipping);
-            }
+            url.searchParams.append('status', status);
 
             window.location.href = url.toString();
             document.getElementById("orderLimit").value = '';
         }
 
         function exportOrdersSuccess() {
-            console.log("exportOrdersSuccess")
             let limit = document.getElementById("orderSuccessLimit").value || 10;
-            let status = $('#orderStatus').val() || '';
-            let shipping = window.getShippingFilterValue() || '';
-            console.log(limit, status, shipping);
+            let status = $('#orderStatus').val();
+
+            if (!status) {
+                Swal.fire({
+                    title: 'خطأ',
+                    text: 'يرجى تحديد نوع الطلب أولاً.',
+                    icon: 'error',
+                    confirmButtonText: 'حسنًا'
+                });
+                return;
+            }
 
             let url = new URL("{{ route('dashboard.orders.export.success') }}");
             url.searchParams.append('limit', limit);
-            if (status) {
-                url.searchParams.append('status', status);
-                console.log("status", status);
-            }
-            if (shipping) {
-                url.searchParams.append('shipping', shipping);
-                console.log("shipping", shipping);
-            }
+            url.searchParams.append('status', status);
 
             window.location.href = url.toString();
             document.getElementById("orderSuccessLimit").value = '';
         }
 
+        function exportBranchOrders() {
+            let limit = document.getElementById("orderBranchLimit").value || 10;
+            let status = $('#orderStatus').val();
 
+            if (!status) {
+                Swal.fire({
+                    title: 'خطأ',
+                    text: 'يرجى تحديد نوع الطلب أولاً.',
+                    icon: 'error',
+                    confirmButtonText: 'حسنًا'
+                });
+                return;
+            }
+
+            let url = new URL("{{ route('dashboard.orders.export.branch') }}");
+            url.searchParams.append('limit', limit);
+            url.searchParams.append('status', status);
+
+            window.location.href = url.toString();
+            document.getElementById("orderBranchLimit").value = '';
+        }
 
         function validateInput(input) {
             if (input.value < 1) {

@@ -230,7 +230,7 @@ if ($filter_end_date) {
 $where_sql = count($where_clauses) > 0 ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
 
 // Get total records for pagination
-$total_q = mysqli_query($conn, "SELECT COUNT(pit.id) as total FROM purchases pi JOIN suppliers s ON pi.supplier_id = s.id JOIN purchase_items pit ON pi.id = pit.purchase_id JOIN products p ON pit.product_id = p.id $where_sql");
+$total_q = mysqli_query($conn, "SELECT COUNT(pit.id) as total FROM purchases pi JOIN suppliers s ON pi.supplier_id = s.id JOIN purchase_items pit ON pi.id = pit.purchase_id JOIN products p ON pit.product_id = p.id LEFT JOIN branches b ON pi.branch_id = b.id $where_sql");
 $total_records = mysqli_fetch_assoc($total_q)['total'];
 $total_pages = ceil($total_records / $limit);
 
@@ -239,6 +239,11 @@ $history_query = "
     SELECT 
         pi.id as purchase_id, 
         pi.purchase_date, 
+        pi.branch_id,
+        CASE 
+            WHEN pi.branch_id IS NULL OR pi.branch_id = 'main' THEN 'المخزن الرئيسي'
+            ELSE b.name 
+        END as branch_name,
         s.name as supplier_name, 
         p.name as product_name, 
         pit.quantity, 
@@ -248,6 +253,7 @@ $history_query = "
     JOIN suppliers s ON pi.supplier_id = s.id
     JOIN purchase_items pit ON pi.id = pit.purchase_id
     JOIN products p ON pit.product_id = p.id
+    LEFT JOIN branches b ON pi.branch_id = b.id
     $where_sql
     ORDER BY pi.purchase_date DESC, pi.id DESC
     LIMIT $limit OFFSET $offset
@@ -296,6 +302,7 @@ $history_result = mysqli_query($conn, $history_query);
                 <tr>
                     <th>رقم الفاتورة</th>
                     <th>التاريخ</th>
+                    <th>الفرع</th>
                     <th>المورد</th>
                     <th>المنتج</th>
                     <th>الكمية</th>
@@ -309,6 +316,7 @@ $history_result = mysqli_query($conn, $history_query);
                         <tr>
                             <td><?= $row['purchase_id'] ?></td>
                             <td><?= $row['purchase_date'] ?></td>
+                            <td><?= htmlspecialchars($row['branch_name']) ?></td>
                             <td><?= htmlspecialchars($row['supplier_name']) ?></td>
                             <td><?= htmlspecialchars($row['product_name']) ?></td>
                             <td><?= $row['quantity'] ?></td>
@@ -318,7 +326,7 @@ $history_result = mysqli_query($conn, $history_query);
                     <?php endwhile; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="7">لا توجد فواتير لعرضها.</td>
+                        <td colspan="8">لا توجد فواتير لعرضها.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Nafezly\Payments\Classes\TapPayment;
 use Nafezly\Payments\Classes\FawryPayment;
 use Nafezly\Payments\Classes\HyperPayPayment;
@@ -132,9 +133,11 @@ class PaymentController extends Controller
             $order->is_paid = 1;
             $hasReservedProduct = false;
             foreach ($order->orderDetails as $detail) {
-                if (!empty($detail->products) && $detail->products->state == 2) {
-                    $hasReservedProduct = true;
-                    break;
+                if (!empty($detail->products)) {
+                    Log::info("Webhook (Before Update) - Order ID: {$order->id}, Product ID: {$detail->product_id}, State: {$detail->products->state}, Quantity: {$detail->products->quantity}");
+                    if ($detail->products->state == 2) {
+                        $hasReservedProduct = true;
+                    }
                 }
             }
             $order->status = $hasReservedProduct ? "reserved" : "success";
@@ -172,7 +175,10 @@ class PaymentController extends Controller
             }
             // Atomic restore
             $product->increment('quantity', $item->qty);
-            $product->state = ($product->quantity > 0) ? 1 : 0;
+            $product->refresh(); // Add this line to refresh the model
+            if ($product->state != 2) {
+                $product->state = $product->quantity > 0 ? 1 : 0;
+            }
             $product->save();
             Cart::instance('shopping')->remove($item->rowId);
         }
@@ -192,8 +198,11 @@ class PaymentController extends Controller
                     continue;
                 }
                 $product->increment('quantity', $detail->amout);
+                $product->refresh(); // Add this line to refresh the model
                 // Update state based on quantity
-                $product->state = ($product->quantity > 0) ? 1 : 0;
+                if ($product->state != 2) {
+                    $product->state = $product->quantity > 0 ? 1 : 0;
+                }
                 $product->save();
             }
         }
@@ -216,8 +225,11 @@ class PaymentController extends Controller
                     continue;
                 }
                 $product->increment('quantity', $detail->amout);
+                $product->refresh(); // Add this line to refresh the model
                 // Update state based on quantity
-                $product->state = ($product->quantity > 0) ? 1 : 0;
+                if ($product->state != 2) {
+                    $product->state = $product->quantity > 0 ? 1 : 0;
+                }
                 $product->save();
             }
         }

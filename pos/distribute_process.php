@@ -16,12 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
 $from_branch = isset($_POST['from_branch_id']) ? $_POST['from_branch_id'] : '';
 $to_branch = isset($_POST['to_branch_id']) ? $_POST['to_branch_id'] : '';
-$quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 0;
+$products_data = isset($_POST['products_data']) ? $_POST['products_data'] : '';
 
-if ($product_id <= 0 || $quantity <= 0 || empty($from_branch) || empty($to_branch)) {
+if (empty($from_branch) || empty($to_branch) || empty($products_data)) {
     redirect_with_error('missing');
 }
 
@@ -29,41 +28,57 @@ if ($from_branch === $to_branch) {
     redirect_with_error('invalid'); // Cannot transfer to the same branch
 }
 
+// Decode products data
+$products = json_decode($products_data, true);
+if (!$products || !is_array($products) || count($products) === 0) {
+    redirect_with_error('no_products');
+}
+
 // Start transaction
 mysqli_begin_transaction($conn);
 
 try {
-    // Decrement from source
-    if ($from_branch === 'main') {
-        $check_sql = "SELECT stock FROM products WHERE id = $product_id FOR UPDATE";
-        $result = mysqli_query($conn, $check_sql);
-        $product = mysqli_fetch_assoc($result);
-        if (!$product || $product['stock'] < $quantity) {
-            throw new Exception('insufficient');
-        }
-        mysqli_query($conn, "UPDATE products SET stock = stock - $quantity WHERE id = $product_id");
-    } else {
-        $from_branch_id = intval($from_branch);
-        $check_sql = "SELECT quantity FROM product_stock WHERE product_id = $product_id AND branch_id = $from_branch_id FOR UPDATE";
-        $result = mysqli_query($conn, $check_sql);
-        $stock = mysqli_fetch_assoc($result);
-        if (!$stock || $stock['quantity'] < $quantity) {
-            throw new Exception('insufficient');
-        }
-        mysqli_query($conn, "UPDATE product_stock SET quantity = quantity - $quantity WHERE product_id = $product_id AND branch_id = $from_branch_id");
-    }
+    // Process each product
+    foreach ($products as $product) {
+        $product_id = intval($product['id']);
+        $quantity = intval($product['qty']);
 
-    // Increment at destination
-    if ($to_branch === 'main') {
-        mysqli_query($conn, "UPDATE products SET stock = stock + $quantity WHERE id = $product_id");
-    } else {
-        $to_branch_id = intval($to_branch);
-        $check_sql = "SELECT id FROM product_stock WHERE product_id = $product_id AND branch_id = $to_branch_id";
-        $result = mysqli_query($conn, $check_sql);
-        if (mysqli_num_rows($result) > 0) {
-            mysqli_query($conn, "UPDATE product_stock SET quantity = quantity + $quantity WHERE product_id = $product_id AND branch_id = $to_branch_id");
+        if ($product_id <= 0 || $quantity <= 0) {
+            throw new Exception('invalid');
+        }
+
+        // Decrement from source
+        if ($from_branch === 'main') {
+            $check_sql = "SELECT stock FROM products WHERE id = $product_id FOR UPDATE";
+            $result = mysqli_query($conn, $check_sql);
+            $product_stock = mysqli_fetch_assoc($result);
+            if (!$product_stock || $product_stock['stock'] < $quantity) {
+                throw new Exception('insufficient');
+            }
+            mysqli_query($conn, "UPDATE products SET stock = stock - $quantity WHERE id = $product_id");
         } else {
-            mysqli_query($conn, "INSERT INTO product_stock (product_id, branch_id, quantity) VALUES ($product_id, $to_branch_id, $quantity)");
+            $from_branch_id = intval($from_branch);
+            $check_sql = "SELECT quantity FROM product_stock WHERE product_id = $product_id AND branch_id = $from_branch_id FOR UPDATE";
+            $result = mysqli_query($conn, $check_sql);
+            $stock = mysqli_fetch_assoc($result);
+            if (!$stock || $stock['quantity'] < $quantity) {
+                throw new Exception('insufficient');
+            }
+            mysqli_query($conn, "UPDATE product_stock SET quantity = quantity - $quantity WHERE product_id = $product_id AND branch_id = $from_branch_id");
+        }
+
+        // Increment at destination
+        if ($to_branch === 'main') {
+            mysqli_query($conn, "UPDATE products SET stock = stock + $quantity WHERE id = $product_id");
+        } else {
+            $to_branch_id = intval($to_branch);
+            $check_sql = "SELECT id FROM product_stock WHERE product_id = $product_id AND branch_id = $to_branch_id";
+            $result = mysqli_query($conn, $check_sql);
+            if (mysqli_num_rows($result) > 0) {
+                mysqli_query($conn, "UPDATE product_stock SET quantity = quantity + $quantity WHERE product_id = $product_id AND branch_id = $to_branch_id");
+            } else {
+                mysqli_query($conn, "INSERT INTO product_stock (product_id, branch_id, quantity) VALUES ($product_id, $to_branch_id, $quantity)");
+            }
         }
     }
 

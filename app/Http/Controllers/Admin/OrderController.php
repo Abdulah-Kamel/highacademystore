@@ -317,9 +317,15 @@ class OrderController extends Controller
         $status = $request->query('status');
         $shipping = $request->query('shipping');
 
-        $query = Order::with(['orderDetails.products', 'shipping'])->latest();
+        $query = Order::with(['orderDetails.products', 'shipping'])
+            ->whereDoesntHave('shipping', function ($q) {
+                $q->where('type', 'branch');
+            })
+            ->latest();
 
-        $query->whereIn('status', ['success', 'reserved']);
+        if ($status) {
+            $query->where('status', $status);
+        }
 
         if ($shipping) {
             $query->where('shipping_method', $shipping);
@@ -341,6 +347,43 @@ class OrderController extends Controller
         exit;
     }
 
+    public function branchExport(Request $request)
+    {
+        ini_set('pcre.backtrack_limit', 10000000);
+
+        $limit  = $request->query('limit', 10);
+        $status = $request->query('status');
+        $shipping = $request->query('shipping');
+
+        $query = Order::with(['orderDetails.products', 'shipping'])
+            ->whereHas('shipping', function ($q) {
+                $q->where('type', 'branch');
+            })
+            ->latest();
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($shipping) {
+            $query->where('shipping_method', $shipping);
+        }
+
+        $orders = $query->limit($limit)->get();
+
+        $mpdf = new Mpdf([
+            'default_font'   => 'DejaVu Sans',
+            'mode'           => 'utf-8',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'format'         => 'A4',
+        ]);
+
+        $html = view('admin.order.successExport', compact('orders'))->render();
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('branch-orders.pdf', 'D');
+        exit;
+    }
 
     public function changeStatus($order_id, $status)
     {

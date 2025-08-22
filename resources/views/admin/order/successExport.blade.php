@@ -160,7 +160,7 @@ function reverseWords($string)
                                 <p style="font-size: 14px; color: #118B50; margin: 0px;"><b style="color: #118B50;">رقم
                                         الطلب</b>: {{ $order->id }}</p>
                                 <br />
-                                @if ($order->is_fastDelivery == 1)
+                                @if ($order->is_fastDelivery == 1)i
                                     <p style="text-align: left; font-weight: 900; font-size: 24px; color: red;">
                                         <b>
                                             البريد السريع

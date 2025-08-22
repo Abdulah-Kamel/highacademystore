@@ -12,6 +12,13 @@ $branch_q = mysqli_query($conn, "SELECT id, name FROM branches ORDER BY name");
 while ($br = mysqli_fetch_assoc($branch_q)) {
     $branches[] = $br;
 }
+
+// جلب المنتجات
+$products = [];
+$prod_query = mysqli_query($conn, "SELECT id, name FROM products");
+while ($prod = mysqli_fetch_assoc($prod_query)) {
+    $products[] = $prod;
+}
 ?>
 
 <div class="container mt-5">
@@ -35,6 +42,9 @@ while ($br = mysqli_fetch_assoc($branch_q)) {
                     case 'invalid':
                         echo 'بيانات غير صالحة.';
                         break;
+                    case 'no_products':
+                        echo 'يجب إضافة منتج واحد على الأقل للتحويل.';
+                        break;
                     default:
                         echo 'حدث خطأ غير متوقع.';
                         break;
@@ -43,21 +53,7 @@ while ($br = mysqli_fetch_assoc($branch_q)) {
         </div>
     <?php endif; ?>
 
-    <form action="distribute_process.php" method="POST" onsubmit="return validateForm();">
-        <div class="mb-3">
-            <label for="product_input" class="form-label">اختر المنتج:</label>
-            <input list="products_list" id="product_input" class="form-control" placeholder="ابحث أو اختر المنتج..." required>
-            <datalist id="products_list">
-                <?php
-                $products_q = mysqli_query($conn, "SELECT id, name FROM products");
-                while ($row = mysqli_fetch_assoc($products_q)) {
-                    echo "<option value='" . htmlspecialchars($row['name']) . "' data-id='" . $row['id'] . "'></option>";
-                }
-                ?>
-            </datalist>
-            <input type="hidden" name="product_id" id="product_id_hidden" required>
-        </div>
-
+    <form id="transferForm" action="distribute_process.php" method="POST">
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="from_branch_id" class="form-label">من مخزن/فرع:</label>
@@ -81,10 +77,48 @@ while ($br = mysqli_fetch_assoc($branch_q)) {
             </div>
         </div>
 
-        <div class="mb-3">
-            <label for="quantity" class="form-label">الكمية المراد تحويلها:</label>
-            <input type="number" name="quantity" class="form-control" min="1" required>
+        <div class="row g-3 align-items-end mb-4">
+            <!-- اختيار المنتج مع بحث -->
+            <div class="col-md-8">
+                <label class="form-label">اختر المنتج:</label>
+                <input list="products_list" id="product_input" class="form-control" placeholder="ابحث أو اختر المنتج..." autocomplete="off">
+                <datalist id="products_list">
+                    <?php foreach ($products as $prod): ?>
+                        <option value="<?= htmlspecialchars($prod['name']) ?>" data-id="<?= $prod['id'] ?>"></option>
+                    <?php endforeach; ?>
+                </datalist>
+                <input type="hidden" id="product_id_hidden">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">الكمية:</label>
+                <input type="number" id="quantity_input" class="form-control" min="1">
+            </div>
+
+            <div class="col-md-1 d-grid">
+                <button type="button" onclick="addProductRow()" class="btn btn-success">➕</button>
+            </div>
         </div>
+
+        <div class="mt-4">
+            <h6>المنتجات المراد تحويلها:</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center align-middle" id="transferTable">
+                    <thead>
+                        <tr>
+                            <th>المنتج</th>
+                            <th>الكمية</th>
+                            <th>حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- الصفوف ستضاف ديناميكياً -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <input type="hidden" name="products_data" id="products_data">
 
         <button type="submit" class="btn btn-primary">تحويل المخزون</button>
     </form>
@@ -93,33 +127,97 @@ while ($br = mysqli_fetch_assoc($branch_q)) {
 <?php include 'footer.php'; ?>
 
 <script>
-    function validateForm() {
-        // Validate product selection
-        var input = document.getElementById('product_input').value;
-        var options = document.getElementById('products_list').options;
-        var productFound = false;
-        for (var i = 0; i < options.length; i++) {
-            if (options[i].value === input) {
-                document.getElementById('product_id_hidden').value = options[i].getAttribute('data-id');
-                productFound = true;
+    let transferItems = [];
+
+    document.getElementById('product_input').addEventListener('input', function() {
+        let inputValue = this.value;
+        let options = document.getElementById('products_list').options;
+        let foundId = '';
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === inputValue) {
+                foundId = options[i].getAttribute('data-id');
                 break;
             }
         }
-        if (!productFound) {
-            document.getElementById('product_id_hidden').value = '';
-            alert('يرجى اختيار منتج صحيح من القائمة.');
-            return false;
+        document.getElementById('product_id_hidden').value = foundId;
+    });
+
+    function addProductRow() {
+        let prodName = document.getElementById('product_input').value.trim();
+        let qty = parseInt(document.getElementById('quantity_input').value);
+        let productId = document.getElementById('product_id_hidden').value;
+
+        if (!prodName || !qty) {
+            alert("يرجى ملء جميع الحقول للمنتج!");
+            return;
         }
 
-        // Validate branches
+        // التحقق من أن المنتج موجود في القائمة
+        if (!productId) {
+            alert('يرجى اختيار منتج صحيح من القائمة.');
+            return;
+        }
+
+        // لو المنتج مكرر؟ زود الكمية فقط
+        let found = transferItems.findIndex(item => item.id === productId);
+        if (found > -1) {
+            transferItems[found].qty += qty;
+        } else {
+            transferItems.push({
+                id: productId,
+                name: prodName,
+                qty: qty
+            });
+        }
+
+        renderTransferTable();
+        // امسح الحقول
+        document.getElementById('product_input').value = '';
+        document.getElementById('quantity_input').value = '';
+    }
+
+    function removeRow(idx) {
+        transferItems.splice(idx, 1);
+        renderTransferTable();
+    }
+
+    function renderTransferTable() {
+        let tbody = document.querySelector('#transferTable tbody');
+        tbody.innerHTML = '';
+
+        transferItems.forEach((item, idx) => {
+            let row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.qty}</td>
+                <td><button type="button" onclick="removeRow(${idx})" class="btn btn-sm btn-danger">🗑️</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // قبل إرسال الفورم: التحقق من صحة البيانات
+    document.getElementById('transferForm').onsubmit = function() {
+        // التحقق من الفروع
         var fromBranch = document.getElementById('from_branch_id').value;
         var toBranch = document.getElementById('to_branch_id').value;
 
-        if (fromBranch && toBranch && fromBranch === toBranch) {
+        if (!fromBranch || !toBranch) {
+            alert('يرجى اختيار الفرع المصدر والوجهة.');
+            return false;
+        }
+
+        if (fromBranch === toBranch) {
             alert('لا يمكن تحويل المخزون إلى نفس الفرع المصدر.');
             return false;
         }
 
+        if (transferItems.length === 0) {
+            alert('يجب إضافة منتج واحد على الأقل للتحويل.');
+            return false;
+        }
+
+        document.getElementById('products_data').value = JSON.stringify(transferItems);
         return true;
     }
 </script>

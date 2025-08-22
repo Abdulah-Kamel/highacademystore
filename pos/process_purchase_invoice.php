@@ -11,7 +11,8 @@ if (
     isset($_POST['supplier_id'])
 ) {
     $supplier_id = mysqli_real_escape_string($conn, $_POST['supplier_id']);
-    $branch_id = isset($_POST['branch_id']) ? intval($_POST['branch_id']) : 0;
+    $branch_id_raw = isset($_POST['branch_id']) ? $_POST['branch_id'] : 'main';
+    $branch_id_sql = "'" . mysqli_real_escape_string($conn, $branch_id_raw) . "'";
     $items = json_decode($_POST['products_data'], true);
 
     if (!$items || !is_array($items) || !$supplier_id) {
@@ -27,7 +28,7 @@ if (
 
     // 2. Insert into purchases
     $now = date('Y-m-d H:i:s');
-    $purchase_sql = "INSERT INTO purchases (supplier_id, purchase_date, total_amount) VALUES ($supplier_id, '$now', $total_amount)";
+    $purchase_sql = "INSERT INTO purchases (supplier_id, purchase_date, total_amount, branch_id) VALUES ($supplier_id, '$now', $total_amount, $branch_id_sql)";
     if (!mysqli_query($conn, $purchase_sql)) {
         echo "<div class='alert alert-danger text-center mt-5'>❌ فشل في إضافة الفاتورة: " . mysqli_error($conn) . "</div>";
         exit;
@@ -59,13 +60,14 @@ if (
         }
 
         // تحديث المخزون حسب الفرع
-        if ($branch_id > 0) {
+        if ($branch_id_raw !== 'main') {
+            $branch_id_int = intval($branch_id_raw);
             // تحديث أو إدخال في جدول product_stock
-            $check_stock = mysqli_query($conn, "SELECT quantity FROM product_stock WHERE product_id = $product_id AND branch_id = $branch_id");
+            $check_stock = mysqli_query($conn, "SELECT quantity FROM product_stock WHERE product_id = $product_id AND branch_id = $branch_id_int");
             if (mysqli_num_rows($check_stock) > 0) {
-                mysqli_query($conn, "UPDATE product_stock SET quantity = quantity + $qty WHERE product_id = $product_id AND branch_id = $branch_id");
+                mysqli_query($conn, "UPDATE product_stock SET quantity = quantity + $qty WHERE product_id = $product_id AND branch_id = $branch_id_int");
             } else {
-                mysqli_query($conn, "INSERT INTO product_stock (product_id, branch_id, quantity) VALUES ($product_id, $branch_id, $qty)");
+                mysqli_query($conn, "INSERT INTO product_stock (product_id, branch_id, quantity) VALUES ($product_id, $branch_id_int, $qty)");
             }
         } else {
             // لو مفيش فرع (المخزن الرئيسي)

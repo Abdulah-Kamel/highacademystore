@@ -21,27 +21,11 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
 }
 
 // Check specific page permissions
-$page = strtolower($page); // Convert to lowercase for case-insensitive comparison
-$check = mysqli_prepare($conn, "SELECT 1 FROM user_permissions WHERE user_id = ? AND LOWER(page) = ? AND can_access = 1");
-mysqli_stmt_bind_param($check, "is", $user_id, $page);
-mysqli_stmt_execute($check);
-$result = mysqli_stmt_get_result($check);
-
-if (mysqli_num_rows($result) == 0) {
-    // Log the permission denied attempt
-    error_log("Permission denied for user $user_id trying to access $page");
-    
-    // Redirect to sales page with an error message
-    $_SESSION['error'] = "ليس لديك صلاحية للوصول إلى هذه الصفحة";
-    if ($page !== 'sales.php') {
-        header("Location: sales.php");
-        exit();
-    }
-    // If already on sales.php but no permission, show an error
-    if (!isset($_SESSION['error_shown'])) {
-        $_SESSION['error_shown'] = true;
-        echo "<script>alert('ليس لديك صلاحية للوصول إلى هذه الصفحة');</script>";
-    }
+$check = mysqli_query($conn, "SELECT * FROM user_permissions WHERE user_id = $user_id AND page = '$page' AND can_access = 1");
+if (mysqli_num_rows($check) == 0) {
+    // توجيه المستخدم تلقائيًا لصفحة الكاشير إذا لم يملك صلاحية الصفحة
+    header("Location: sales.php");
+    exit();
 }
 
 app_log('REQUEST: ' . $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . ' | GET: ' . json_encode($_GET) . ' | POST: ' . json_encode($_POST) . ' | SESSION: ' . json_encode($_SESSION));
