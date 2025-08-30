@@ -379,7 +379,7 @@ class OrderController extends Controller
             'format'         => 'A4',
         ]);
 
-        $html = view('admin.order.successExport', compact('orders'))->render();
+        $html = view('admin.order.export', compact('orders'))->render();
         $mpdf->WriteHTML($html);
         $mpdf->Output('branch-orders.pdf', 'D');
         exit;
