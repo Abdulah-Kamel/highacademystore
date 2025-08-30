@@ -64,8 +64,8 @@ class ShippingMethodController extends Controller
             'type'       => 'required|in:post,home,branch',
             'government' => 'nullable|integer',
             'address'    => 'nullable|string|max:191',
-            'phones'     => 'required|array|min:1',
-            'phones.*'   => 'required|string',
+            'phones'     => 'nullable|array',
+            'phones.*'   => 'nullable|string',
             'fee'        => 'required|numeric|min:0',  // ← new rule
         ]);
 
@@ -92,8 +92,8 @@ class ShippingMethodController extends Controller
             'type'       => 'required|in:post,home,branch',
             'government' => 'nullable|integer',
             'address'    => 'nullable|string|max:191',
-            'phones'     => 'required|array|min:1',
-            'phones.*'   => 'required|string',
+            'phones'     => 'nullable|array',
+            'phones.*'   => 'nullable|string',
             'fee'        => 'required|numeric|min:0',  // ← new rule
         ]);
 

@@ -245,7 +245,6 @@ $discountAmount = session()->has('applied_discount')
                                 style="display:flex; justify-content:space-between; flex-direction: row-reverse;">
                                 <div style="text-align: right">
                                     <h3>مصاريف الشحن</h3>
-                                    <p>التوصيل لاقرب مكتب بريد</p>
                                 </div>
                                 <h3 id="delivery"></h3>
                             </div>
@@ -549,7 +548,6 @@ $discountAmount = session()->has('applied_discount')
                 // إيجاد طريقة الشحن من الـ ID
                 if (!method) return;
                 let deliveryFee = Number(method.fee);
-
                 // لو استلام من المكتبة → التوصيل = صفر
                 // if (method.type === 'branch') {
                 //     deliveryFee = 0;
@@ -560,11 +558,11 @@ $discountAmount = session()->has('applied_discount')
 
                 const taxFast = {{ $productTax }};
                 const taxNormal = {{ $productSlowTax }};
-
+                console.log("deliveryFee", deliveryFee, "govPrice", govPrice, "taxFast", taxFast, "taxNormal", taxNormal);
                 if (method.type === 'home') {
-                    deliveryFee = govPrice + taxFast + 30;
+                    deliveryFee += govPrice + taxFast;
                 } else if (method.type === 'post') {
-                    deliveryFee = govPrice + taxNormal;
+                    deliveryFee += govPrice + taxNormal;
                 }
                 // }
 

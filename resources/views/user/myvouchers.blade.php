@@ -98,6 +98,10 @@
         .bounce {
             animation: bounce 1s ease;
         }
+
+        .voucher-code {
+            text-transform: none !important;
+        }
     </style>
 
     <div class="container pt-5">

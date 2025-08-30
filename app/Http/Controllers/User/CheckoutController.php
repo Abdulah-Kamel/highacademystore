@@ -98,9 +98,9 @@ class CheckoutController extends Controller
             ->sum(fn($p) => $p->qty * ($p->model->slowTax ?? 10));
 
         if ($method->type === 'home') {
-            $fee = $base + $taxFast + 30 + $baseFee;
+            $fee = $base + $taxFast + $baseFee;
         } else { // post
-            $fee = $base + $taxNormal + $baseFee;
+            $fee = $taxNormal + $baseFee;
         }
 
         return [$address, $fee];

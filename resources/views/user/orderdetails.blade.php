@@ -108,17 +108,17 @@
 
                             <div class="col-12 hh-grayBox pt45 pb20 card shadow-sm">
                                 <div class="row justify-content-between">
-                                    <div class="order-tracking {{ $order->status === 'new' || $order->status === 'reserved' || $order->status === 'success' ? 'completed' : '' }}">
+                                    <div class="order-tracking {{ $order->barcode ? 'completed' : '' }}">
                                         <span class="is-complete"></span>
-                                        <p>قيد المراجعة<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
+                                        <p>قيد التوصيل<br><span>{{ $order->barcode ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                     </div>
                                     <div class="order-tracking {{ $order->status === 'reserved' || $order->status === 'success' ? 'completed' : '' }}">
                                         <span class="is-complete"></span>
                                         <p>قيد التجهيز<br><span>{{ $order->status === 'reserved' || $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
                                     </div>
-                                    <div class="order-tracking {{ $order->status === 'success' ? 'completed' : '' }}">
+                                    <div class="order-tracking {{ $order->status === 'new' || $order->status === 'success' ? 'completed' : '' }}">
                                         <span class="is-complete"></span>
-                                        <p>قيد التوصيل<br><span>{{ $order->status === 'success' ? $order->updated_at->format('M d, Y') : 'قريباً' }}</span></p>
+                                        <p>قيد المراجعة<br><span>{{ $order->created_at->format('M d, Y') }}</span></p>
                                     </div>
                                 </div>
                             </div>

@@ -47,13 +47,13 @@
                 <div class="col-12">
                     <label class="form-label">رسوم الخدمة (جنيه)</label>
                     <input type="number" name="fee" step="0.01" class="form-control form-control-lg"
-                        value="{{ old('fee', $shippingMethod->fee ?? '0.00') }}" required>
+                        value="{{ old('fee', $shippingMethod->fee ?? '0.00') }}">
                 </div>
 
                 {{-- Governorate --}}
                 <div class="col-12">
                     <label class="form-label">المحافظة</label>
-                    <select name="government" class="form-control form-control-lg" required>
+                    <select name="government" class="form-control form-control-lg">
                         <option value="">اختر المحافظة</option>
                         @foreach ($govs as $g)
                             <option value="{{ $g['id'] }}"
@@ -68,7 +68,7 @@
                 <div class="col-12">
                     <label class="form-label">العنوان</label>
                     <input type="text" name="address" class="form-control form-control-lg"
-                        value="{{ old('address', $shippingMethod->address ?? '') }}" required>
+                        value="{{ old('address', $shippingMethod->address ?? '') }}">
                 </div>
 
                 {{-- Phones --}}
