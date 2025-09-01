@@ -100,7 +100,7 @@ class CheckoutController extends Controller
         if ($method->type === 'home') {
             $fee = $base + $taxFast + $baseFee;
         } else { // post
-            $fee = $taxNormal + $baseFee;
+            $fee = $base + $taxNormal + $baseFee;
         }
 
         return [$address, $fee];
@@ -274,7 +274,7 @@ class CheckoutController extends Controller
             $amount_to_pay = $order->total + ($order->total * 0.01) + 2.5;
 
             $currentDateTime = Carbon::now();
-            $futureDateTime = $currentDateTime->addHours(4);
+            $futureDateTime = $currentDateTime->addHours(3);
             $futureTimestamp = $futureDateTime->timestamp * 1000;
             $response = $this->createLink(
                 $amount_to_pay,

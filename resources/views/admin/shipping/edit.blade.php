@@ -68,7 +68,7 @@
                     <label class="form-label">أرقام الهاتف</label>
                     <input type="text" id="phones" name="phones" class="form-control form-control-lg"
                         placeholder="أضف رقماً ثم اضغط Enter"
-                        value="{{ old('phones', implode(',', $shippingMethod->phones)) }}">
+                        value="{{ old('phones', is_array($shippingMethod->phones) ? implode(',', $shippingMethod->phones) : ($shippingMethod->phones ?? '')) }}">
                 </div>
 
                 {{-- Submit --}}

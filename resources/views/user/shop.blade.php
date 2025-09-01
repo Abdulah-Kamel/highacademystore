@@ -114,7 +114,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12 d-flex justify-content-center mt-4">
-                        {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+                        {{ $products->appends(request()->query())->links() }}
                     </div>
                 </div>
             </div>

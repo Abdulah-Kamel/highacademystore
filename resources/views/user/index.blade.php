@@ -4,13 +4,12 @@
 @endsection
 @section('content')
     <!-- Carousel Start -->
-    <div class="container-fluid mb-3 mt-5 pt-3">
+    <div class="container-fluid mb-3 mt-5 pt-5">
         <div class="row px-xl-5 pt-5 g-1 align-items-center">
 
 
             <div class="col-lg-6 col-12" style="padding-right: 10px !important;">
-                <div id="header-carousel" class="carousel slide carousel-fade mb-30 mb-lg-0" data-ride="carousel"
-                    data-interval="2000">
+              <div id="header-carousel" class="carousel slide carousel-fade mb-30 mb-lg-0" data-ride="carousel" data-interval="2000">
 
                     <ol class="carousel-indicators">
                         @if (isset($offers) && $offers->count() > 0)
@@ -153,8 +152,7 @@
 
             <!-- new book  Start -->
             <div class="container-fluid pt-5 pb-3">
-                <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-5"><span
-                        class="bg-secondary">المنتجات
+                <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-5"><span class="bg-secondary">المنتجات
                         المضافه حديثا </span></h2>
                 <div class="row px-xl-5 g-5">
                     @include('user.layouts.product')
@@ -293,6 +291,7 @@
         </style>
         <!-- Lazy Loading Script -->
         <script>
+            
             document.addEventListener("DOMContentLoaded", function() {
                 const lazyImages = document.querySelectorAll("img.lazy");
 
@@ -320,18 +319,17 @@
                 }
             });
         </script>
-        <!--Start of Tawk.to Script-->
-        <script type="text/javascript">
-            var Tawk_API = Tawk_API || {},
-                Tawk_LoadStart = new Date();
-            (function() {
-                var s1 = document.createElement("script"),
-                    s0 = document.getElementsByTagName("script")[0];
-                s1.async = true;
-                s1.src = 'https://embed.tawk.to/683185022dd3111911d08f8d/1is0mv50j';
-                s1.charset = 'UTF-8';
-                s1.setAttribute('crossorigin', '*');
-                s0.parentNode.insertBefore(s1, s0);
-            })();
-        </script>
-        <!--End of Tawk.to Script-->
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/683185022dd3111911d08f8d/1is0mv50j';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+<!--End of Tawk.to Script-->

@@ -50,6 +50,15 @@ class VoucherOrderController extends Controller
             ->editColumn('id', function ($row) {
                 return $row->id;
             })
+            ->addColumn('customer_name', function ($row) {
+                return $row->user_name ?? $row->user->name ?? 'غير متوفر';
+            })
+            ->addColumn('customer_email', function ($row) {
+                return $row->user_email ?? $row->user->email ?? 'غير متوفر';
+            })
+            ->addColumn('customer_phone', function ($row) {
+                return $row->user_phone ?? $row->user->phone ?? 'غير متوفر';
+            })
             ->addColumn('details', function ($row) {
                 $details = '<a href="' . route('dashboard.voucher_order.details', $row->id) . '" type="button" class="btn btn-lg btn-block btn-success lift text-uppercase p-3 ">تفاصيل</a>';
                 return $details;
@@ -81,7 +90,7 @@ class VoucherOrderController extends Controller
                         return "<h2 class='badge bg-danger'>طلب ملغي</h2>";
                 }
             })
-            ->rawColumns(['state', 'account', 'method', 'details', 'image', 'coupon', 'id'])
+            ->rawColumns(['state', 'account', 'method', 'details', 'image', 'coupon', 'id', 'customer_name', 'customer_email', 'customer_phone'])
             ->toJson();
     }
 

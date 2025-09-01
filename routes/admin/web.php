@@ -115,6 +115,7 @@ Route::group(
             Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
             Route::get('orders/export/success', [OrderController::class, 'successExport'])->name('orders.export.success');
             Route::get('orders/export/branch', [OrderController::class, 'branchExport'])->name('orders.export.branch');
+            Route::get('orders/export/grouped', [OrderController::class, 'groupedExport'])->name('orders.export.grouped');
             Route::get("orders/edit-barcode/{id}", [OrderController::class, "admineditbarcode"])->name("orders.editbarcode");
             Route::get("orders/barcode", [OrderController::class, "orderbarcode"])->name("orders.barcode");
             Route::post("orders/add-barcode", [OrderController::class, "addbarcode"])->name("orders.addbarcode");
@@ -124,6 +125,8 @@ Route::group(
             //            Route::get("order/status/success/{id}", [OrderController::class, "changeSuccessStatus"])->name("changeSuccessStatus");
             Route::get("order/edit/{id}", [OrderController::class, "editOrder"])->name("editOrder");
             Route::put("order/update/{id}", [OrderController::class, "updateOrder"])->name("updateOrder");
+            Route::put("order/update/book/{id}", [OrderController::class, "updateBook"])->name("updateOrderBook");
+
             Route::get("order/update/all/reversed/orders", [OrderController::class, "update_all_reversed_order"])->name("update_all_reversed_order");
 
 

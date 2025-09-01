@@ -1,12 +1,12 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 date_default_timezone_set('Africa/Cairo');
 $host = "localhost";
-$user = "root";
-$password = "Abdullah123123";
-$dbname = "pos_system";
+$user = "u114442604_pos_system";
+$password = "/KrY77S52";
+$dbname = "u114442604_pos_system";
 
 $conn = mysqli_connect($host, $user, $password, $dbname);
 

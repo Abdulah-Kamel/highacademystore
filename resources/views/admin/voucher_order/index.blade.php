@@ -55,6 +55,9 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>اسم العميل</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>رقم الهاتف</th>
                             <th>الكوبون</th>
                             <th>عدد الكوبونات المطلوبة</th>
                             <th>وسيلة الدفع</th>
@@ -99,6 +102,18 @@
                     {
                         data: 'id',
                         name: 'id'
+                    },
+                    {
+                        data: 'customer_name',
+                        name: 'customer_name'
+                    },
+                    {
+                        data: 'customer_email',
+                        name: 'customer_email'
+                    },
+                    {
+                        data: 'customer_phone',
+                        name: 'customer_phone'
                     },
                     {
                         data: 'coupon',

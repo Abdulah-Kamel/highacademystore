@@ -11,11 +11,14 @@ class VouchersOrder extends Model
     protected $fillable=[
         "coupon_id",
         "user_id",
+        "user_name",
+        "user_email",
+        "user_phone",
         "method",
         "ref_code",
         "quantity",
         "state",
         "image",
         "account"
-        ];
+    ];
 }

@@ -4,36 +4,93 @@
 @endsection
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        /* Force Select2 box to look like .form-control */
+        .select2-container .select2-selection--single {
+            height: calc(2.25rem + 2px); /* same as Bootstrap form-control */
+            line-height: 2.25rem;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            font-family: inherit;
+            width: 100%;
+            display: inline-block;
+        }
+
+        /* Fix the arrow alignment */
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 100%;
+            right: 10px;
+            top: 0;
+        }
+    </style>
+
     <center>
         <div class="col-12 d-flex justify-content-center align-items-center mt-2">
             <div class="card shadow-sm w-100 p-4 p-md-5" style="max-width: 64rem;">
                 <h3>الكتب المطلوبة</h3>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">المنتج</th>
-                            <th scope="col">السعر</th>
-                            <th scope="col">الكميه</th>
-                            <th scope="col">المبلغ الاجملي</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($order->orderDetails as $item)
+                <form action="{{ route('dashboard.updateOrderBook', $order->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $item->products->short_name }}</th>
-                                <td>{{ $item->price }}</td>
-                                <td>{{ $item->amout }}</td>
-                                <td>{{ $item->total_price }}</td>
+                                <th scope="col">المنتج</th>
+                                <th scope="col">السعر</th>
+                                <th scope="col">الكميه</th>
+                                <th scope="col">المبلغ الاجملي</th>
+                                <th scope="col">إجراء</th>
                             </tr>
-                        @endforeach
-                        <tr>
-                            <th scope="row">الاجمـــالي</th>
-                            <td></td>
-                            <td></td>
-                            <td>{{ $order->amount }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($order->orderDetails as $index => $item)
+                                <tr>
+                                    <th scope="row">
+                                        {{ $item->products->short_name }}
+                                        <input type="hidden" name="items[{{ $index }}][id]" value="{{ $item->id }}">
+                                    </th>
+                                    <td>{{ $item->price }}</td>
+                                    <td>
+                                        <input type="number" name="items[{{ $index }}][amount]" value="{{ $item->amout }}" min="1" class="form-control" style="max-width: 100px;">
+                                    </td>
+                                    <td>{{ $item->total_price }}</td>
+                                    <td>
+                                        <button type="submit" name="remove" value="{{ $item->id }}" class="btn btn-danger btn-sm">حذف</button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            <tr>
+                                <td>
+                                    <select id="productSelect" name="new_item[product_id]" class="form-control" style="width: 100%;">
+                                        <option value="">اختر منتج</option>
+                                        @foreach ($products as $product)
+                                            <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td></td>
+                                <td>
+                                    <input type="number" name="new_item[amount]" min="1" value="1" class="form-control" style="max-width: 100px;">
+                                </td>
+                                <td></td>
+                                <td>
+                                    <button type="submit" name="add" value="1" class="btn btn-success btn-sm">إضافة</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">الاجمـــالي</th>
+                                <td></td>
+                                <td></td>
+                                <td>{{ $order->amount }}</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary w-full mb-5">حفظ التغييرات</button>
+                </form>
+
                 <h3>تفاصيل الطلب</h3>
                 <form method="post" action="{{ route('dashboard.updateOrder', $order->id) }}">
                     @csrf
@@ -160,6 +217,18 @@
     @section('js')
         <!--import jquery -->
         <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+        <script>
+            $(document).ready(function() {
+                $('#productSelect').select2({
+                    placeholder: "🔍 ابحث عن منتج...",
+                    allowClear: true,
+                    dir: "rtl"
+                });
+            });
+        </script>
 
         <script>
             /***** DELETE order ******/

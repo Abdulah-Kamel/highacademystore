@@ -98,6 +98,9 @@ class VoucherController extends Controller
         $order = VouchersOrder::create([
             "coupon_id" => $coupon->id,
             "user_id" => $user->id,
+            "user_name" => $user->name,
+            "user_email" => $user->email,
+            "user_phone" => $user->phone,
             "quantity" => $request->qty,
         ]);
 
@@ -192,6 +195,9 @@ public function manual_payment(Request $request)
         $order = VouchersOrder::create([
             "coupon_id" => $coupon->id,
             "user_id" => $user->id,
+                "user_name" => $user->name,
+                "user_email" => $user->email,
+                "user_phone" => $user->phone,
             "quantity" => $request->qty,
             'image' => $image,
             "method" => "manual",

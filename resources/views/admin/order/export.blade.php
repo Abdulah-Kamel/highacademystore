@@ -23,31 +23,33 @@ function reverseWords($string)
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <style>
-        body {
+    <style type="text/css" media="all">
+        >body {
             font-family: 'DejaVu Sans', sans-serif;
             direction: rtl;
             text-align: right;
-            font-size: 12px;
+            font-size: 14px;
             word-wrap: break-word;
             white-space: normal;
+            padding: 0;
+            margin: 0;
         }
 
 
-        table {
+        .export {
             width: 100%;
             border-collapse: collapse;
             direction: rtl;
         }
 
-        table,
-        th,
-        td {
+        .export,
+        .export th,
+        .export td {
             border: 1px solid black;
         }
 
-        th,
-        td {
+        .export th,
+        .export td {
             padding: 8px;
             text-align: right;
             word-break: break-word;
@@ -57,8 +59,8 @@ function reverseWords($string)
 </head>
 
 <body dir="rtl">
-    <h2>{{ 'الطلبات الناجحة' }}</h2>
-    <table>
+    <h1>الطلبات الناجحة</h1>
+    <table class="export">
         <thead>
             <tr>
                 <th>رقم الطلب</th>
@@ -70,14 +72,15 @@ function reverseWords($string)
                 <th>الكتب المطلوبة</th>
             </tr>
         </thead>
-
         <tbody>
             @foreach ($orders as $order)
+
                 <tr>
                     <td>{{ $order->id }}</td>
                     <td>{{ $order->name }}</td>
                     <td>{{ $order->mobile }}</td>
-                    <td>{{ optional($order->shipping)->name ?: '-' }}</td>
+                    <td>{{ optional($order->shipping)->name ?: '-' }}
+                    </td>
                     <td>{{ $order->address }}</td>
 
                     <td>
@@ -85,7 +88,7 @@ function reverseWords($string)
                     </td>
                     <td>
                         @foreach ($order->orderDetails as $d)
-                            x{{ $d->amout }} {{ $d->products->short_name ?? 'محذوف' }}<br>
+                            {{ $d->amout }} {{ $d->products->short_name ?? 'محذوف' }}<br>
                         @endforeach
                     </td>
                 </tr>

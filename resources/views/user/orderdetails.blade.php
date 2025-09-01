@@ -7,6 +7,9 @@
             crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" />
         <style>
+            .bg-warning{
+                background-color: #e99239 !important;
+            }
             /* … your existing styles … */
             
             /* Order Tracker Styles */
@@ -29,7 +32,7 @@
                 height: 30px;
                 width: 30px;
                 border: 0px solid #AFAFAF;
-                background-color: #f7be16;
+                background-color: #a3a3a3;
                 margin: 0 auto;
                 transition: background 0.25s linear;
                 -webkit-transition: background 0.25s linear;
@@ -51,9 +54,9 @@
                 opacity: 0;
             }
             .order-tracking.completed .is-complete{
-                border-color: #27aa80;
+                border-color: #1C8555;
                 border-width: 0px;
-                background-color: #27aa80;
+                background-color: #1C8555;
             }
             .order-tracking.completed .is-complete:after {
                 border-color: #fff;
@@ -75,15 +78,15 @@
                 content: '';
                 display: block;
                 height: 3px;
-                width: calc(100% - 40px);
-                background-color: #f7be16;
+                width: calc(100% - 25px);
+                background-color: #a3a3a3;
                 top: 13px;
                 position: absolute;
-                left: calc(-50% + 20px);
+                left: calc(-50% + 10px);
                 z-index: 0;
             }
             .order-tracking:first-child:before{display: none;}
-            .order-tracking.completed:before{background-color: #27aa80;}
+            .order-tracking.completed:before{background-color: #1C8555;}
 
             /* Barcode Section adjustments */
             .barcode-section h4 { font-weight: 700; }
@@ -92,6 +95,12 @@
             .hl-underline { position: relative; display: inline-block; }
             .hl-underline::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2px; height: 8px; background: rgba(40,167,69,.25); border-radius: 4px; z-index: -1; }
 
+@media screen and (max-width: 600px) {
+    .order-tracking p {
+                font-size: 14px;
+            }
+}
+    
 
         </style>
 
@@ -312,13 +321,13 @@
                         </ul>
 
                         {{-- Edit Button for new/reserved --}}
-                        @if (in_array($order->status, ['new', 'reserved']))
-                            <div class="text-center mt-3">
-                                <a href="{{ route('user.order.edit', $order->id) }}" class="btn btn-info">
-                                    <i class="fas fa-edit me-1"></i> تعديل بيانات الطلب
-                                </a>
-                            </div>
-                        @endif
+                        <!--@if (in_array($order->status, ['new', 'reserved']))-->
+                        <!--    <div class="text-center mt-3">-->
+                        <!--        <a href="{{ route('user.order.edit', $order->id) }}" class="btn btn-info">-->
+                        <!--            <i class="fas fa-edit me-1"></i> تعديل بيانات الطلب-->
+                        <!--        </a>-->
+                        <!--    </div>-->
+                        <!--@endif-->
                     </div>
                 </div>
             </div>

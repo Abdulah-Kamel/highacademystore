@@ -91,6 +91,15 @@
                         </div>
                     </div>
                     <div class="w-100 mb-2">
+                        <label for="orderGroupedLimit" class="form-label">تصدير الطلبات الناجحه بالتقصيل</label>
+                        <div class="input-group">
+                            <input type="number" id="orderGroupedLimit" class="form-control"
+                                placeholder="عدد طلبات الفروع للتصدير" min="1" oninput="validateInput(this)">
+                            <button class="btn btn-info text-white" onclick="exportGroupedOrders()">تصدير الطلبات
+                                الناجحة</button>
+                        </div>
+                    </div>
+                    <div class="w-100 mb-2">
                         <label for="orderBranchLimit" class="form-label">تصدير طلبات الفروع</label>
                         <div class="input-group">
                             <input type="number" id="orderBranchLimit" class="form-control" 
@@ -381,6 +390,27 @@
 
             window.location.href = url.toString();
             document.getElementById("orderSuccessLimit").value = '';
+        }
+        function exportGroupedOrders() {
+            let limit = document.getElementById("orderGroupedLimit").value || 10;
+            let status = $('#orderStatus').val();
+
+            if (!status) {
+                Swal.fire({
+                    title: 'خطأ',
+                    text: 'يرجى تحديد نوع الطلب أولاً.',
+                    icon: 'error',
+                    confirmButtonText: 'حسنًا'
+                });
+                return;
+            }
+
+            let url = new URL("{{ route('dashboard.orders.export.grouped') }}");
+            url.searchParams.append('limit', limit);
+            url.searchParams.append('status', status);
+
+            window.location.href = url.toString();
+            document.getElementById("orderGroupedLimit").value = '';
         }
 
         function exportBranchOrders() {

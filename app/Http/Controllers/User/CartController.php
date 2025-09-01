@@ -62,13 +62,13 @@ class CartController extends Controller
         $product_id = $request->input('product_id');
         $object_product = Product::findorfail($product_id);
         $product = Product::getProductByCart($product_id);
-        if (Product::findorfail($product_id)->state != 2) {
-            if (!$product || $product[0]['state'] == 0 || $product[0]['quantity'] == 0 || $product[0]['quantity'] < $product_qty) {
-                return response()->json([
-                    'status' => false,
-                    'message' => "العنصر غير متاح حاليًا أو الكمية غير كافية"
-                ]);
-            }
+
+        // Check stock availability for all products, regardless of state
+        if (!$product || $product[0]['state'] == 0 || $product[0]['quantity'] == 0 || $product[0]['quantity'] < $product_qty) {
+            return response()->json([
+                'status' => false,
+                'message' => "العنصر غير متاح حاليًا أو الكمية غير كافية"
+            ]);
         }
 
         // [ADDED] Check if user is trying to add more than 30 in a single addition
@@ -105,7 +105,7 @@ class CartController extends Controller
                 ]);
             }
 
-            // Ensure Stock is Available
+            // Ensure Stock is Available for additional quantity
             if ($product[0]['quantity'] < $product_qty) {
                 return response()->json([
                     'status' => false,
@@ -224,13 +224,7 @@ class CartController extends Controller
 
             $product->quantity = $product->quantity + ($cart->qty - $request_quantity);
 
-            if ($product->state != 2) {
-                if ($product->quantity == 0) {
-                    $product->state = 0;
-                } else {
-                    $product->state = 1;
-                }
-            }
+            $product->state = ($product->quantity > 0) ? 1 : 0;
             //            if ($product->quantity == 0) {
             //                $product->state = 0;
             //            } else {
@@ -314,9 +308,7 @@ class CartController extends Controller
 
         $product->quantity = $product->quantity + $cart->qty;
         //        $product->state = 1;
-        if ($product->state != 2) {
-            $product->state = 1;
-        }
+        $product->state = ($product->quantity > 0) ? 1 : 0;
         $product->save();
 
         $response['status'] = true;

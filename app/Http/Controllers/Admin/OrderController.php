@@ -346,6 +346,40 @@ class OrderController extends Controller
         $mpdf->Output('success-orders.pdf', 'D');
         exit;
     }
+    
+    public function groupedExport(Request $request)
+    {
+        ini_set('pcre.backtrack_limit', 10000000);
+        $limit = $request->query('limit', 10);
+        $status = $request->query('status');
+        $shipping = $request->query('shipping');
+
+        $query = Order::with('shipping')->latest();
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($shipping) {
+            $query->where('shipping_method', $shipping);
+        }
+
+        $orders = $query->limit($limit)->get();
+
+        $mpdf = new Mpdf([
+            'default_font' => 'DejaVu Sans',
+            'mode' => 'utf-8',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'format' => 'A4'
+        ]);
+        $html = view('admin.order.groupedExport', compact('orders'))->render();
+
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('grouped-orders.pdf', 'D');
+        exit;
+    }
+
 
     public function branchExport(Request $request)
     {
@@ -423,14 +457,14 @@ class OrderController extends Controller
             'address'               => 'required|string|max:255',
             'address2'              => 'nullable|string|max:255',
             'near_post'             => 'nullable|string|max:255',
-            'shipping_method_id'    => 'required|exists:shipping_methods,id',
+            'shipping_method'    => 'required|exists:shipping_methods,id',
         ]);
 
         $order = Order::findOrFail($order_id);
         $order->fill($data);
 
         // overwrite name/address from the shipping method
-        $method = \App\Models\ShippingMethod::find($data['shipping_method_id']);
+        $method = \App\Models\ShippingMethod::find($data['shipping_method']);
         $order->shipping_name    = $method->name;
         $order->shipping_address = $method->address;
 
@@ -447,7 +481,49 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($order_id);
         $shippingMethods = ShippingMethod::all();
-        return view('admin.order.edit', compact('order', 'shippingMethods'));
+        $products = Product::where('quantity', '>', 0)->get();
+        return view('admin.order.edit', compact('order', 'shippingMethods', 'products'));
+    }
+    
+    public function updateBook(Request $request,  $order_id)
+    {
+        $order = Order::findOrFail($order_id);
+        if ($request->has('remove')) {
+            $detailId = $request->input('remove');
+            $order->orderDetails()->where('id', $detailId)->delete();
+        }
+        // 🔹 Update existing items
+        if ($request->has('items')) {
+            foreach ($request->items as $itemData) {
+                $detail = $order->orderDetails()->where('id', $itemData['id'])->first();
+                if ($detail) {
+                    $detail->amout = $itemData['amount'];
+                    $detail->total_price = $detail->price * $itemData['amount'];
+                    $detail->save();
+                }
+            }
+        }
+           // 🔹 Add a new product
+        if ($request->has('new_item') && !empty($request->new_item['product_id'])) {
+            $productId = $request->new_item['product_id'];
+            $amount = $request->new_item['amount'] ?? 1;
+
+            $product = Product::find($productId);
+            if ($product) {
+                $order->orderDetails()->create([
+                    'product_id' => $product->id,
+                    'price' => $product->price, // assume product has price column
+                    'amout' => $amount,
+                    'total_price' => $product->price * $amount,
+                ]);
+            }
+        }
+
+        // 🔹 Recalculate order total
+        $order->amount = $order->orderDetails()->sum('total_price');
+        $order->save();
+
+        return redirect()->back()->with('success', 'تم تحديث الطلب بنجاح ✨');
     }
     public function update_all_reversed_order(): \Illuminate\Http\RedirectResponse
     {

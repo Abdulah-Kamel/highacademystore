@@ -62,9 +62,9 @@ Route::group(
             Route::get('/myorders', [UserController::class, 'myorders'])->middleware("UserAuth")->name('orders.user');
             Route::get('/myorders/{id}', [UserController::class, 'order_details'])->middleware("UserAuth")->name('order.details');
             // In web.php
-            Route::get('/order/{id}/edit', [UserController::class, 'editOrder'])
-                ->name('order.edit')
-                ->withoutMiddleware(['localize']);
+            // Route::get('/order/{id}/edit', [UserController::class, 'editOrder'])
+            //     ->name('order.edit')
+            //     ->withoutMiddleware(['localize']);
                 
             Route::get('/myvouchers', [UserController::class, 'myvouchers'])->middleware("UserAuth")->name('vochers.user');
             Route::get('/myaccount', [UserController::class, 'edit'])->middleware("UserAuth")->name('myaccount');

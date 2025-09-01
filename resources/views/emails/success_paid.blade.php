@@ -118,17 +118,19 @@
             <h1>High Academy Store</h1>
         </div>
         <div class="content">
-            <h2>أهلاً {{ $order->name }}, طلبك قيد التجهيز!</h2>
-            <p>شكراً لطلبك من متجرنا. طلبك رقم <strong>#{{ $order->id }}</strong> قد تم تأكيده وسنبدأ في تجهيزه
-                فوراً.</p>
+            <h2>أهلاً {{ $order->name }},</h2>
+            @if($order->status != 'reserved')
+            <h2>طلبك قيد التجهيز!</h2>
+            @endif
+            <p>شكراً لطلبك من متجرنا. طلبك رقم <strong>#{{ $order->id }}</strong> قد تم تأكيده .</p>
 
-            @if (!Str::contains(optional($order->shipping)->name, 'استلام من المكتبة'))
+            {{-- @if (!Str::contains(optional($order->shipping)->name, 'استلام من المكتبة') || optional($order->status)->isNot('reserved'))
                 <div class="shipping-details">
                     <p>سيصل إليك الطلب خلال <strong>3–5 أيام عمل</strong>.
                         <br><small>(يرجى العلم أن الجمعة والسبت إجازة في شركات الشحن).</small>
                     </p>
                 </div>
-            @endif
+            @endif --}}
 
             <h3>ملخص الطلب</h3>
             <table class="order-summary-table">

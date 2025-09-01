@@ -1,7 +1,7 @@
 @extends('user.layouts.master')
 
 @section('title')
-    السلة
+    بيانات الشحن
 @endsection
 @section('content')
     <style>

@@ -25,6 +25,24 @@
                     </tbody>
                 </table>
 
+                <h3>معلومات العميل</h3>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">اسم العميل</th>
+                            <td>{{ $order->user_name ?? $order->user->name ?? 'غير متوفر' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">البريد الإلكتروني</th>
+                            <td>{{ $order->user_email ?? $order->user->email ?? 'غير متوفر' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">رقم الهاتف</th>
+                            <td>{{ $order->user_phone ?? $order->user->phone ?? 'غير متوفر' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
                 <h3>تفاصيل الطلب</h3>
                 <table class="table">
                     <tbody>

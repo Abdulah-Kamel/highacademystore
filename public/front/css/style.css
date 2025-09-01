@@ -10438,16 +10438,16 @@ section {
 }
 
 
-  .bg-warning,
-        .btn-primary {
-            background-color: #e99239 !important;
-        }
+.bg-warning,
+.btn-primary {
+    background-color: #e99239 !important;
+}
 
-        .text-primary,
-        text-warning {
-            color: #e99239 !important;
-        }
+.text-primary,
+text-warning {
+    color: #e99239 !important;
+}
 
-        .btn-primary {
-            border: none;
-        }
+.btn-primary {
+    border: none;
+}

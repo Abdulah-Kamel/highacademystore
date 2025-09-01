@@ -64,68 +64,69 @@
             </button>
         </form>
         <br>
-        <div class="accordion" id="accordionExample">
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseThree" aria-expanded="false"
-                        aria-controls="collapseThree"
-                        style="padding-top:7px; padding-bottom:7px; padding-left:5px">
-                        <img src="https://i.ibb.co/27xZPJN/Picsart-24-06-10-11-22-37-597.png"
-                            height="25px"></img>
-                        <h6 style="margin-top:11px; margin-left:10px; ">E - Wallets</h6>
+        <!-- E Wallets -->
+        <!--<div class="accordion" id="accordionExample">-->
+        <!--    <div class="accordion-item">-->
+        <!--        <h2 class="accordion-header">-->
+        <!--            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"-->
+        <!--                data-bs-target="#collapseThree" aria-expanded="false"-->
+        <!--                aria-controls="collapseThree"-->
+        <!--                style="padding-top:7px; padding-bottom:7px; padding-left:5px">-->
+        <!--                <img src="https://i.ibb.co/27xZPJN/Picsart-24-06-10-11-22-37-597.png"-->
+        <!--                    height="25px"></img>-->
+        <!--                <h6 style="margin-top:11px; margin-left:10px; ">E - Wallets</h6>-->
 
-                    </button>
-                </h2>
-                <div id="collapseThree" class="accordion-collapse collapse"
-                    data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                        <center>
-                            <form id="ManualPayForm" enctype="multipart/form-data">
-                                <input type="hidden" name="id" value="{{ $coupon->id }}" />
-                                <input type="hidden" name="qty" value="{{ $request->qty }}" />
-                                <input type="hidden" id="manualPayTypeInput" name="type" value="" />
+        <!--            </button>-->
+        <!--        </h2>-->
+        <!--        <div id="collapseThree" class="accordion-collapse collapse"-->
+        <!--            data-bs-parent="#accordionExample">-->
+        <!--            <div class="accordion-body">-->
+        <!--                <center>-->
+        <!--                    <form id="ManualPayForm" enctype="multipart/form-data">-->
+        <!--                        <input type="hidden" name="id" value="{{ $coupon->id }}" />-->
+        <!--                        <input type="hidden" name="qty" value="{{ $request->qty }}" />-->
+        <!--                        <input type="hidden" id="manualPayTypeInput" name="type" value="" />-->
                     
-                                @csrf
-                                <strong>
-                                    <p>قم بتحويل مبلغ
-                                        <span id="all"></span> علي رقم
-                                    </p>
-                                    <h3>
-                                        01093014817
-                                    </h3>
-                                    <p>وقم بكتابة الرقم المحول منه</p>
-                                    <input class="form-control" type="number" id="account" name="account"
-                                        pattern="\d{11}" minlength="11" maxlength="11" placeholder="الرقم المحول منه" 
-                                        required />
-                                    <br>
-                                </strong>
+        <!--                        @csrf-->
+        <!--                        <strong>-->
+        <!--                            <p>قم بتحويل مبلغ-->
+        <!--                                <span id="all"></span> علي رقم-->
+        <!--                            </p>-->
+        <!--                            <h3>-->
+        <!--                                01093014817-->
+        <!--                            </h3>-->
+        <!--                            <p>وقم بكتابة الرقم المحول منه</p>-->
+        <!--                            <input class="form-control" type="number" id="account" name="account"-->
+        <!--                                pattern="\d{11}" minlength="11" maxlength="11" placeholder="الرقم المحول منه" -->
+        <!--                                required />-->
+        <!--                            <br>-->
+        <!--                        </strong>-->
                                 <!--- reciept image-->
-                                <div class="mt-3" style="width: 90%;">
-                                    <div class="image-input">
-                                        <strong>
-                                            <p>ارفع صورة من ايصال التحويل</p>
-                                        </strong>
-                                        <div class="preview">
-                                            <img id="file-ip-1-preview">
-                                        </div>
-                                        <label for="file-ip-1">اختر صورة</label>
-                                        <input type="file" name="screenshot" id="file-ip-1" accept="image/*"
-                                            onchange="showPreview(event);">
-                                    </div>
-                                </div>
+        <!--                        <div class="mt-3" style="width: 90%;">-->
+        <!--                            <div class="image-input">-->
+        <!--                                <strong>-->
+        <!--                                    <p>ارفع صورة من ايصال التحويل</p>-->
+        <!--                                </strong>-->
+        <!--                                <div class="preview">-->
+        <!--                                    <img id="file-ip-1-preview">-->
+        <!--                                </div>-->
+        <!--                                <label for="file-ip-1">اختر صورة</label>-->
+        <!--                                <input type="file" name="screenshot" id="file-ip-1" accept="image/*"-->
+        <!--                                    onchange="showPreview(event);">-->
+        <!--                            </div>-->
+        <!--                        </div>-->
                                 <!-- end recipt image-->
-                                <p>سيتم مراجعة عملية الدفع يدويا واخبارك بعد تاكيد الاوردر</p>
+        <!--                        <p>سيتم مراجعة عملية الدفع يدويا واخبارك بعد تاكيد الاوردر</p>-->
                     
-                                <button type="button" id="ManualPayButton" pay-type="manual" class="btn btn-outline-info w-100 PayButton">
-                                    ارفع صوره الايصال
-                                </button>
-                            </form>
-                        </center>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!--                        <button type="button" id="ManualPayButton" pay-type="manual" class="btn btn-outline-info w-100 PayButton">-->
+        <!--                            ارفع صوره الايصال-->
+        <!--                        </button>-->
+        <!--                    </form>-->
+        <!--                </center>-->
+        <!--            </div>-->
+        <!--        </div>-->
+        <!--    </div>-->
+        <!--</div>-->
         
     </div>
 </div>

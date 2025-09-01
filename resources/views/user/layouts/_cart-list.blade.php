@@ -42,7 +42,7 @@
                                                 <a href="{{ route('user.product.show', $item->id) }}"
                                                     class="nav-link text-dark">{{ $item->name }}</a>
                                             </td>
-                                            <td>{{ number_format($item->price, 2) }} جنيه</td>
+                                            <td>{{ number_format((float)$item->price, 2) }} جنيه</td>
                                             <td>{{ $item->options->color }}</td>
                                             <td>{{ $item->options->size }}</td>
                                             <td>
@@ -53,7 +53,7 @@
                                             </td>
                                             <td>
                                                 <span class="item-subtotal" data-id="{{ $item->rowId }}">
-                                                    {{ number_format($item->subtotal(), 2) }} جنيه
+                                                    {{ number_format((float)$item->subtotal(), 2) }} جنيه
                                                 </span>
                                             </td>
                                         </tr>
@@ -75,7 +75,7 @@
 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <p class="card-text">
-                                        <strong>السعر:</strong> {{ number_format($item->price, 2) }} جنيه
+                                        <strong>السعر:</strong> {{ number_format((float)$item->price, 2) }} جنيه
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <input type="number" class="form-control qty-input" data-id="{{ $item->rowId }}"
@@ -100,7 +100,7 @@
                                 <p class="card-text mb-3">
                                     <strong>الاجمالي:</strong>
                                     <span class="item-subtotal" data-id="{{ $item->rowId }}">
-                                        {{ number_format($item->subtotal(), 2) }} جنيه
+                                        {{ number_format((float)$item->subtotal(), 2) }} جنيه
                                     </span>
                                 </p>
 
