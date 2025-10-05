@@ -385,42 +385,35 @@ class UserController extends Controller
 
     public function registerSubmit(Request $request)
     {
-        try {
-            $validatedData = $request->validate([
-                'name' => 'string|required',
-                'email' => 'required|unique:users,email',
-                // 'phone' => 'required|numeric|regex:/^(01[0125])[0-9]{8}$/',
-                // 'address' => 'required',
-                'password' => 'min:6|required|confirmed',
-            ], [
-                'name.required' => 'الاسم مطلوب.',
-                'email.required' => 'البريد الإلكتروني مطلوب.',
-                'email.unique' => 'البريد الإلكتروني مسجل لدينا مسبقاً.',
-                // 'phone.required' => 'رقم الهاتف مطلوب.',
-                // 'address.required' => 'العنوان مطلوب.',
-                'password.required' => 'كلمة المرور مطلوبة.',
-                'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 حروف.',
-                'password.confirmed' => 'كلمة المرور غير مطابقة.',
-                // 'phone.regex' => 'رقم الهاتف يجب أن يتكون من 11 رقم.',
-                // 'phone.numeric' => 'رقم الهاتف يجب أن يحتوي على ارقام فقط.',
-            ]);
+        $validatedData = $request->validate([
+            'name' => 'string|required',
+            'email' => 'required|unique:users,email|regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/',
+            // 'phone' => 'required|numeric|regex:/^(01[0125])[0-9]{8}$/ ',
+            // 'address' => 'required',
+            'password' => 'min:6|required|confirmed',
+        ], [
+            'name.required' => 'الاسم مطلوب.',
+            'name.string' => 'الاسم مطلوب.',
+            'email.required' => 'البريد الإلكتروني مطلوب.',
+            'email.unique' => 'البريد الإلكتروني مسجل لدينا مسبقاً.',
+            'email.regex' => 'اتاكد ان البريد الإلكتروني صحيح ومفيش مسافات.',
+            // 'phone.required' => 'رقم الهاتف مطلوب.',
+            // 'address.required' => 'العنوان مطلوب.',
+            'password.required' => 'كلمة المرور مطلوبة.',
+            'password.min' => 'كلمة المرور يجب أن تكون على الأقل 6 حروف.',
+            'password.confirmed' => 'كلمة المرور غير مطابقة.',
+            // 'phone.regex' => 'رقم الهاتف يجب أن يتكون من 11 رقم.',
+            // 'phone.numeric' => 'رقم الهاتف يجب أن يحتوي على ارقام فقط.',
+        ]);
 
-            $validatedData['password'] = bcrypt($request->password);
-            $validatedData['address'] = "";
-            $validatedData['phone'] = "";
-            $user = User::create($validatedData);
+        $validatedData['password'] = bcrypt($request->password);
+        $validatedData['address'] = "";
+        $validatedData['phone'] = "";
+        $user = User::create($validatedData);
 
-            Auth::login($user, true);
+        Auth::login($user, true);
 
-            return redirect()->route('user.home');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $errors = $e->validator->errors()->all();
-            $customErrors = array_map(function ($error) {
-                return $error . ' حاول مرة أخرى';
-            }, $errors);
-
-            return redirect()->back()->withErrors($customErrors);
-        }
+        return redirect()->route('user.home');
     }
 
     public function register()

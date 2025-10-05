@@ -321,13 +321,13 @@
                         </ul>
 
                         {{-- Edit Button for new/reserved --}}
-                        <!--@if (in_array($order->status, ['new', 'reserved']))-->
-                        <!--    <div class="text-center mt-3">-->
-                        <!--        <a href="{{ route('user.order.edit', $order->id) }}" class="btn btn-info">-->
-                        <!--            <i class="fas fa-edit me-1"></i> تعديل بيانات الطلب-->
-                        <!--        </a>-->
-                        <!--    </div>-->
-                        <!--@endif-->
+                        {{-- @if (in_array($order->status, ['new', 'reserved']))
+                            <div class="text-center mt-3">
+                                <a href="{{ route('user.order.edit', $order->id) }}" class="btn btn-info">
+                                    <i class="fas fa-edit me-1"></i> تعديل بيانات الطلب
+                                </a>
+                            </div>
+                        @endif --}}
                     </div>
                 </div>
             </div>

@@ -209,6 +209,7 @@
                                         onclick="increaseQuantity({{ $item->id }},event , {{$item->max_qty_for_order}})">
                                         <i class="fa-solid fa-plus"></i>
                                     </button>
+                                    كلمة المرور يجب أن تكون على الأقل 6 حروف.
                                 </div>
                             @endif
                         @endauth
@@ -512,7 +513,16 @@
             let quantity = parseInt(quantityElement.text()) || 0; // منع NaN
 
             // التحقق من الحد الأقصى قبل الزيادة
-            if (quantity >= maxQty) {
+            if (maxQty === 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "الكمية نفذت",
+                    text: "عفواً، لقد نفذت الكمية المتاحة للحجز لهذا المنتج.",
+                    confirmButtonText: "حسناً",
+                    timer: 3000
+                });
+                return;
+            } else if (quantity >= maxQty) {
                 Swal.fire({
                     icon: "info",
                     title: "تنبيه",

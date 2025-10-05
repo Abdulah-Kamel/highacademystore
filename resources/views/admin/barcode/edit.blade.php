@@ -28,7 +28,11 @@
 
                 <div class="col-12 text-center mt-4">
                     <button id="submit" type="submit"
-                        class="btn btn-lg btn-block btn-dark lift text-uppercase">حفظ التعديلات</button>
+                        class="btn btn-lg btn-block btn-dark lift text-uppercase">
+                        <span class="btn-text">حفظ التعديلات</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        <span class="loading-text d-none">جاري الحفظ...</span>
+                    </button>
                 </div>
             </form>
 
@@ -45,7 +49,13 @@
     $('#form').submit(function(e) {
         e.preventDefault();
         let formData = new FormData(this);
-        console.log(formData);
+        let submitBtn = $('#submit');
+        
+        // Show loading state
+        submitBtn.prop('disabled', true);
+        submitBtn.find('.btn-text').addClass('d-none');
+        submitBtn.find('.spinner-border').removeClass('d-none');
+        submitBtn.find('.loading-text').removeClass('d-none');
 
         $.ajax({
             url: '{{route('dashboard.orders.addbarcode')}}',
@@ -56,23 +66,71 @@
             processData: false,
 
             success: function(response) {
-                Swal.fire('Data has been Updated successfully', '', 'success');
+                // Hide loading state
+                resetButton();
+                
+                if(response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'نجح الحفظ',
+                        text: response.msg || 'تم حفظ الباركود بنجاح',
+                        confirmButtonText: 'موافق'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: response.msg || 'حدث خطأ أثناء الحفظ',
+                        confirmButtonText: 'موافق'
+                    });
+                }
             },
 
             error: function(xhr, status, error) {
-                let errors = xhr.responseJSON.errors;
+                // Hide loading state
+                resetButton();
+                
                 let errorMessage = '';
-                $.each(errors, function(key, value) {
-                    errorMessage += value[0] + '<br>';
-                });
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    html: errorMessage,
-                });
+                
+                if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                    // Validation errors
+                    let errors = xhr.responseJSON.errors;
+                    $.each(errors, function(key, value) {
+                        errorMessage += value[0] + '<br>';
+                    });
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ في التحقق من البيانات',
+                        html: errorMessage,
+                        confirmButtonText: 'موافق'
+                    });
+                } else if (xhr.responseJSON && xhr.responseJSON.msg) {
+                    // Server error with message
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: xhr.responseJSON.msg,
+                        confirmButtonText: 'موافق'
+                    });
+                } else {
+                    // Generic error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ في الاتصال',
+                        text: 'حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة مرة أخرى.',
+                        confirmButtonText: 'موافق'
+                    });
+                }
             }
-
         });
+        
+        function resetButton() {
+            submitBtn.prop('disabled', false);
+            submitBtn.find('.btn-text').removeClass('d-none');
+            submitBtn.find('.spinner-border').addClass('d-none');
+            submitBtn.find('.loading-text').addClass('d-none');
+        }
     });
 });
 </script>

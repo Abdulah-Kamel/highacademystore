@@ -118,6 +118,7 @@ Route::group(
             Route::get('orders/export/grouped', [OrderController::class, 'groupedExport'])->name('orders.export.grouped');
             Route::get("orders/edit-barcode/{id}", [OrderController::class, "admineditbarcode"])->name("orders.editbarcode");
             Route::get("orders/barcode", [OrderController::class, "orderbarcode"])->name("orders.barcode");
+            Route::get("orders/barcode/list", [OrderController::class, "barcodeOrders"])->name("orders.barcode.list");
             Route::post("orders/add-barcode", [OrderController::class, "addbarcode"])->name("orders.addbarcode");
             Route::post("order/change-state", [OrderController::class, "changestate"])->name("changestate");
 

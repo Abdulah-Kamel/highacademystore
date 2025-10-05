@@ -184,15 +184,20 @@
                 },
                 error: function (xhr) {
                     // عرض الأخطاء من الرسالة JSON
-                    const errors = xhr.responseJSON.errors;
-                    let errorMessage = '';
-                    if (errors) {
-                        for (let key in errors) {
-                            errorMessage += `${errors[key][0]}<br>`;
+                    const response = xhr.responseJSON;
+                    let errorMessage = 'حدث خطأ غير متوقع. حاول مرة أخرى.'; // Default message
+
+                    if (response) {
+                        if (response.errors) { // Handle validation errors
+                            errorMessage = '';
+                            for (let key in response.errors) {
+                                errorMessage += `${response.errors[key][0]}<br>`;
+                            }
+                        } else if (response.message) { // Handle server/catch block errors
+                            errorMessage = response.message;
                         }
-                    } else {
-                        errorMessage = 'حدث خطأ غير متوقع. حاول مرة أخرى.';
                     }
+
                     Swal.fire({
                         icon: 'error',
                         title: 'خطأ',
@@ -242,15 +247,20 @@
                 },
                 error: function (xhr) {
                     // عرض الأخطاء من الرسالة JSON
-                    const errors = xhr.responseJSON.errors;
-                    let errorMessage = '';
-                    if (errors) {
-                        for (let key in errors) {
-                            errorMessage += `${errors[key][0]}<br>`;
+                    const response = xhr.responseJSON;
+                    let errorMessage = 'حدث خطأ غير متوقع. حاول مرة أخرى.'; // Default message
+
+                    if (response) {
+                        if (response.errors) { // Handle validation errors
+                            errorMessage = '';
+                            for (let key in response.errors) {
+                                errorMessage += `${response.errors[key][0]}<br>`;
+                            }
+                        } else if (response.message) { // Handle server/catch block errors
+                            errorMessage = response.message;
                         }
-                    } else {
-                        errorMessage = 'حدث خطأ غير متوقع. حاول مرة أخرى.';
                     }
+
                     Swal.fire({
                         icon: 'error',
                         title: 'خطأ',

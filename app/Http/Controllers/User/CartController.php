@@ -13,6 +13,33 @@ use Illuminate\Http\Request;
 class CartController extends Controller
 {
     /**
+     * Log product state changes with detailed context
+     */
+    private function logStateChange($product, $oldState, $newState, $context, $additionalInfo = [])
+    {
+        $stateNames = [
+            0 => 'Unavailable',
+            1 => 'Available',
+            2 => 'Reserved'
+        ];
+
+        $logData = [
+            'product_id' => $product->id,
+            'product_name' => $product->name ?? 'Unknown',
+            'old_state' => $oldState,
+            'new_state' => $newState,
+            'old_state_name' => $stateNames[$oldState] ?? 'Unknown',
+            'new_state_name' => $stateNames[$newState] ?? 'Unknown',
+            'quantity' => $product->quantity,
+            'context' => $context,
+            'timestamp' => now()->toDateTimeString()
+        ];
+
+        // Add any additional info
+        $logData = array_merge($logData, $additionalInfo);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -26,12 +53,19 @@ class CartController extends Controller
         });
         foreach ($expired as $item) {
             if ($product = Product::find(optional($item->model)->id)) {
+                $oldState = $product->state;
                 // Always restore quantity even if state == 2 (atomic increment)
                 $product->increment('quantity', $item->qty);
+                $product->refresh();
+
                 // Only update state if not state 2
                 if ($product->state != 2) {
-                    $product->state = ($product->quantity > 0) ? 1 : 0;
-                    $product->save();
+                    $newState = ($product->quantity > 02) ? 1 : 0;
+                    if ($oldState != $newState) {
+                        $product->state = $newState;
+                        $product->save();
+                        $this->logStateChange($product, $oldState, $newState, 'Cart Expiration');
+                    }
                 }
             }
             Cart::instance('shopping')->remove($item->rowId);
@@ -117,11 +151,18 @@ class CartController extends Controller
 
             // Deduct only the additional quantity being added
             $product_quantity = Product::find($product_id);
-            // Always deduct quantity even if state == 2
-            $product_quantity->quantity -= $product_qty;
+            $oldState = $product_quantity->state;
+            // Always deduct quantity but prevent negative values
+            $newQuantity = $product_quantity->quantity - $product_qty;
+            $product_quantity->quantity = max(0, $newQuantity); // Prevent negative quantities
+
             // Only update state if not state 2
             if ($product_quantity->state != 2) {
-                $product_quantity->state = ($product_quantity->quantity > 0) ? 1 : 0;
+                $newState = ($product_quantity->quantity > 0) ? 1 : 0;
+                if ($oldState != $newState) {
+                    $product_quantity->state = $newState;
+                    $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Update');
+                }
             }
             $product_quantity->save();
         } else {
@@ -138,11 +179,18 @@ class CartController extends Controller
 
             // Deduct Stock for new item
             $product_quantity = Product::find($product_id);
-            // Always deduct quantity even if state == 2
-            $product_quantity->quantity -= $product_qty;
+            $oldState = $product_quantity->state;
+            // Always deduct quantity but prevent negative values
+            $newQuantity = $product_quantity->quantity - $product_qty;
+            $product_quantity->quantity = max(0, $newQuantity); // Prevent negative quantities
+
             // Only update state if not state 2
             if ($product_quantity->state != 2) {
-                $product_quantity->state = ($product_quantity->quantity > 0) ? 1 : 0;
+                $newState = ($product_quantity->quantity > 0) ? 1 : 0;
+                if ($oldState != $newState) {
+                    $product_quantity->state = $newState;
+                    $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Addition');
+                }
             }
             $product_quantity->save();
         }
@@ -222,14 +270,17 @@ class CartController extends Controller
                 return $response;
             }
 
+            $oldState = $product->state;
             $product->quantity = $product->quantity + ($cart->qty - $request_quantity);
 
-            $product->state = ($product->quantity > 0) ? 1 : 0;
-            //            if ($product->quantity == 0) {
-            //                $product->state = 0;
-            //            } else {
-            //                $product->state = 1;
-            //            }
+            // Only update state if not state 2 and there's an actual change
+            if ($product->state != 2) {
+                $newState = ($product->quantity > 0) ? 1 : 0;
+                if ($oldState != $newState) {
+                    $product->state = $newState;
+                    $this->logStateChange($product, $oldState, $newState, 'Cart Update');
+                }
+            }
             $product->save();
 
             $result = Cart::instance('shopping')->update($rowId, $request_quantity);
@@ -305,10 +356,18 @@ class CartController extends Controller
         $result = Cart::instance('shopping')->remove($rowId);
 
         $product = Product::find($cart->model->id);
+        $oldState = $product->state;
 
         $product->quantity = $product->quantity + $cart->qty;
-        //        $product->state = 1;
-        $product->state = ($product->quantity > 0) ? 1 : 0;
+
+        // Only update state if not state 2 and there's an actual change
+        if ($product->state != 2) {
+            $newState = ($product->quantity > 0) ? 1 : 0;
+            if ($oldState != $newState) {
+                $product->state = $newState;
+                $this->logStateChange($product, $oldState, $newState, 'Cart Deletion');
+            }
+        }
         $product->save();
 
         $response['status'] = true;

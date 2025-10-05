@@ -38,7 +38,7 @@ class VoucherOrderController extends Controller
 
         // التحقق من وجود فلتر الحالة وتطبيقه على الاستعلام
         if ($request->has('state') && !empty($request->state)) {
-            $query->where('status', $request->state);
+            $query->where('state', $request->state);
         }
 
         // ترتيب النتائج حسب id
@@ -70,15 +70,22 @@ class VoucherOrderController extends Controller
                 return $row->account  ?? "لا يوجد";
             })
             ->addColumn('coupon', function ($row) {
-                $coupon = Coupon::findOrFail($row->coupon_id);
-                return $coupon->name  ?? "لا يوجد";
+                try {
+                    $coupon = Coupon::find($row->coupon_id);
+                    return $coupon ? $coupon->name : "لا يوجد";
+                } catch (\Exception $e) {
+                    return "لا يوجد";
+                }
             })
             ->editColumn('quantity', function ($row) {
                 return @$row->quantity  ;
             })
             ->addColumn('image', function ($row) {
-                $link = asset('images/reciept/') . "/" . $row->image;
-                return "<a href='" . $link . "' target='_blank'>عرض الصورة</a>" ;
+                if ($row->image && !empty($row->image)) {
+                    $link = asset('images/reciept/') . "/" . $row->image;
+                    return "<a href='" . $link . "' target='_blank'>عرض الصورة</a>";
+                }
+                return "لا يوجد صورة";
             })
             ->addColumn('state', function ($row) {
                 switch ($row->state) {
@@ -121,7 +128,7 @@ class VoucherOrderController extends Controller
                     'coupon' => $coupon->name,
                     "email" => $users->email
                 ];
-                Mail::to($users->email)->send(new successCoupon($details));
+                Mail::to($users->email)->queue(new successCoupon($details));
 
                 $qty = $order->quantity;
 

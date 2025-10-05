@@ -35,6 +35,10 @@ class OrderController extends Controller
         return view('admin.order.index', compact('shippingMethods'));
     }
 
+    public function barcodeOrders()
+    {
+        return view('admin.barcode.orders');
+    }
 
     public function orderbarcode()
     {
@@ -50,8 +54,10 @@ class OrderController extends Controller
         if ($request->has('state') && !empty($request->state)) {
             $query->where('status', $request->state);
         }
-        if ($request->filled('shipping')) {
-            $query->where('shipping_method', $request->shipping);
+        if ($request->filled('shipping') && $request->shipping !== 'all') {
+            $query->whereHas('shipping', function ($q) use ($request) {
+                $q->where('type', $request->shipping);
+            });
         }
 
 
@@ -133,7 +139,8 @@ class OrderController extends Controller
                 return '<a href=' . route('dashboard.orders.editbarcode', $row->id) . ' type="button" class="btn btn-lg btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
             })
             ->addColumn('shipping_method', function ($row) {
-                if ($method = $row->shipping) {
+            // return $row->shipping_name ?? $row->shipping->name;
+            if ($method = $row->shipping) {
                     if ($method->address) {
                         return "{$method->name}";
                     } else {
@@ -192,7 +199,7 @@ class OrderController extends Controller
                 ];
                 $order->load(['shipping', 'orderDetails.products']);
 
-                Mail::to($order->user->email)->send(new successPaid($order));
+                Mail::to($order->user->email)->queue(new successPaid($order));
             } elseif ($state == "2") {
                 $order->status = "cancelled";
                 foreach ($order->orderDetails as $detail) {
@@ -237,6 +244,16 @@ class OrderController extends Controller
 
     public function addbarcode(Request $request)
     {
+        $request->validate([
+            'barcode' => 'required|string',
+            'id' => 'required|exists:orders,id'
+        ], [
+            'barcode.required' => 'حقل الباركود مطلوب',
+            'barcode.string' => 'الباركود يجب أن يكون نص',
+            'id.required' => 'معرف الطلب مطلوب',
+            'id.exists' => 'الطلب غير موجود'
+        ]);
+
         $barcode = $request->barcode;
         $orderid = $request->id;
         $order = Order::find($orderid);
@@ -258,12 +275,12 @@ class OrderController extends Controller
                 'barcode' => $order->barcode
             ];
 
-            Mail::to($order->user->email)->send(new delivery($details));
+            Mail::to($order->user->email)->queue(new delivery($details));
 
             return response()->json([
-                "success" => false,
+                "success" => true,
                 'code' => 200,
-                'msg' => "تنفيذ الاجراء"
+                'msg' => "تم تحديث الباركود بنجاح"
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -465,6 +482,7 @@ class OrderController extends Controller
 
         // overwrite name/address from the shipping method
         $method = \App\Models\ShippingMethod::find($data['shipping_method']);
+        $order->shipping_method  = $method->id;
         $order->shipping_name    = $method->name;
         $order->shipping_address = $method->address;
 
@@ -520,7 +538,12 @@ class OrderController extends Controller
         }
 
         // 🔹 Recalculate order total
-        $order->amount = $order->orderDetails()->sum('total_price');
+        $orderAmount = $order->orderDetails()->sum('total_price');
+
+        $order->amount = $orderAmount;
+
+        $order->total = $orderAmount + $order->delivery_fee;
+
         $order->save();
 
         return redirect()->back()->with('success', 'تم تحديث الطلب بنجاح ✨');

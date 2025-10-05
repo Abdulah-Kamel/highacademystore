@@ -38,11 +38,14 @@
                     <div class="card text-dark bg-light mb-3">
                         <div class="card-header">انشاء حساب <strong></strong></div>
                         <div class="card-body">
-                            <form action="{{ route('user.register.submit') }}" method="POST">
-                                @csrf @include('user.partials._errors')
+                            <form action="{{ route('user.register.submit') }}" method="POST" novalidate>
+                                @csrf
                                 <div class="mb-3">
                                     <label for="name" class="form-label">الاسم</label>
-                                    <input type="text" id="name" name="name" required class="form-control" />
+                                    <input type="text" id="name" name="name" class="form-control" />
+                                    @error('name')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
 
                                 {{-- <div class="mb-3">
@@ -52,8 +55,11 @@
                                 </div> --}}
                                 <div class="mb-3">
                                     <label for="exampleFormControlInput1" class="form-label">البريد الالكتروني</label>
-                                    <input type="email" name="email" required class="form-control"
+                                    <input type="email" name="email" class="form-control"
                                         id="exampleFormControlInput1" value="{{ old('email') }}" />
+                                    @error('email')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                                 {{-- <div class="mb-3">
                                     <label for="exampleFormControlInput1" class="form-label">العنوان بالكامل</label>
@@ -62,11 +68,14 @@
                                 </div> --}}
                                 <div class="mb-3">
                                     <label for="password" class="form-label">كلمة المرور</label>
-                                    <input type="password" name="password" required class="form-control" id="password" />
+                                    <input type="password" name="password" class="form-control" id="password" />
+                                    @error('password')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label for="password_confirmation" class="form-label">تأكيد كلمة المرور</label>
-                                    <input type="password" name="password_confirmation" required class="form-control"
+                                    <input type="password" name="password_confirmation" class="form-control"
                                         id="password_confirmation" />
                                 </div>
                                 <div class="mb-3">
