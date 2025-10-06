@@ -133,10 +133,10 @@ class OrderController extends Controller
                 return $row->barcode;
             })
             ->addColumn('addbarcode', function ($row) {
-                return '<a href=' . route('dashboard.order.editbarcode', $row->id) . ' type="button" class="btn btn-lg btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
+                return '<a href=' . route('dashboard.order.editbarcode', $row->id) . ' type="button" class="btn btn-sm btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
             })
             ->addColumn('admin_addbarcode', function ($row) {
-                return '<a href=' . route('dashboard.orders.editbarcode', $row->id) . ' type="button" class="btn btn-lg btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
+                return '<a href=' . route('dashboard.orders.editbarcode', $row->id) . ' type="button" class="btn btn-sm btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
             })
             ->addColumn('shipping_method', function ($row) {
             // return $row->shipping_name ?? $row->shipping->name;

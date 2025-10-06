@@ -7,7 +7,7 @@
         table th,
         tr,
         td {
-            font-size: 20px;
+            font-size: 14px;
         }
 
         .back-btn {
