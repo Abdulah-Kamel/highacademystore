@@ -113,9 +113,18 @@ class ProductController extends Controller
                         : '<span class="badge bg-success">نشط</span>';
                 })
                 ->addColumn('state', function ($row) {
-                    return $row->state
-                        ? '<span class="badge bg-success">متوفر</span>'
-                        : '<span class="badge bg-danger">غير متوفر</span>';
+                    switch ($row->state) {
+                        case 0:
+                            return '<span class="badge bg-danger">غير متوفر</span>';
+                        case 1:
+                            return '<span class="badge bg-success">متوفر</span>';
+                        case 2:
+                            return '<span class="badge bg-warning">يمكن حجزه</span>';
+                        case 3:
+                            return '<span class="badge bg-info">سيتوفر قريبا</span>';
+                        default:
+                            return '<span class="badge bg-secondary">غير محدد</span>';
+                    }
                 })
                 ->addColumn('photo', function ($row) {
                     return $row->image_path

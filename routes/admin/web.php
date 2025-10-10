@@ -129,6 +129,8 @@ Route::group(
             Route::put("order/update/book/{id}", [OrderController::class, "updateBook"])->name("updateOrderBook");
 
             Route::get("order/update/all/reversed/orders", [OrderController::class, "update_all_reversed_order"])->name("update_all_reversed_order");
+            Route::post("orders/send-branch-notification", [OrderController::class, "sendBranchNotification"])->name("orders.sendBranchNotification");
+            Route::post("orders/send-individual-notification", [OrderController::class, "sendIndividualNotification"])->name("orders.sendIndividualNotification");
 
 
             //coupons

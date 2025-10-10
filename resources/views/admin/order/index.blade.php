@@ -113,6 +113,7 @@
                             <option value="" disabled selected>اختر</option>
                             <option value="success">الطلبات الناجحة</option>
                             <option value="reserved">الطلبات المحجوزة</option>
+                            <option value="pending">الطلبات المعلقة</option>
                         </select>
                     </div>
                     

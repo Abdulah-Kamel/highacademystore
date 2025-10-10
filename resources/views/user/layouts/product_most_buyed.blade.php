@@ -17,16 +17,20 @@
 
         <div class="product-item bg-light mb-4 position-relative d-flex flex-column justify-content-between rounded-5"
              style="min-height: 100%; border-radius: 20px;">
-            @if ($item->state == 0 || $item->quantity == 0)
-                <div class="ribbon-wrapper">
-                    <div class="ribbon">غير متاح</div>
-                </div>
-            @endif
-            @if($item->state == 2)
-                <div class="ribbon-wrapper">
-                    <div class="ribbon">احجز الان</div>
-                </div>
-            @endif
+             @if ($item->state == 0)
+             <div class="ribbon-wrapper">
+                 <div class="ribbon">غير متاح</div>
+             </div>
+         @elseif($item->state == 2)
+             <div class="ribbon-wrapper">
+                 <div class="ribbon">احجز الان</div>
+             </div>
+         @elseif($item->state == 3)
+             <div class="ribbon-wrapper">
+                 <div class="ribbon bg-info">سيتوفر قريبا</div>
+             </div>
+         @else
+         @endif
             <a href="{{ route('user.product.show', $item->id) }}" class="text-decoration-none ">
                 <div class="product-img ">
                     <div class="overflow-hidden w-100 position-relative"

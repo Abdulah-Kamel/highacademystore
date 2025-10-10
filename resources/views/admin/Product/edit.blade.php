@@ -54,6 +54,7 @@
                         <option value="0" {{ $product->state == 0 ? 'selected' : '' }}>لا</option>
                         <option value="1" {{ $product->state == 1 ? 'selected' : '' }}>نعم</option>
                         <option value="2" {{ $product->state == 2 ? 'selected' : '' }}>يمكن حجزه</option>
+                        <option value="3" {{ $product->state == 3 ? 'selected' : '' }}>سيتوفر قريبا</option>
                     </select>
                 </div>
                 @error('state')

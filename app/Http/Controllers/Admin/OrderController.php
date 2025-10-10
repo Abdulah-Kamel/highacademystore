@@ -14,6 +14,7 @@ use App\Traits\GeneralTrait;
 use App\Traits\ImageTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Mpdf\Mpdf;
 use Yajra\DataTables\Facades\DataTables;
@@ -136,6 +137,10 @@ class OrderController extends Controller
                 return '<a href=' . route('dashboard.order.editbarcode', $row->id) . ' type="button" class="btn btn-sm btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
             })
             ->addColumn('admin_addbarcode', function ($row) {
+            // Don't show barcode button for branch orders
+            if (in_array($row->shipping_method, ['3', '4'])) {
+                return '—';
+            }
                 return '<a href=' . route('dashboard.orders.editbarcode', $row->id) . ' type="button" class="btn btn-sm btn-block btn-success lift text-uppercase">أضافه الباركود</a>';
             })
             ->addColumn('shipping_method', function ($row) {
@@ -169,7 +174,67 @@ class OrderController extends Controller
                         return '';
                 }
             })
-            ->rawColumns(['details', 'edit_order', 'change_status', 'image', 'state', 'addbarcode', 'admin_addbarcode'])
+            ->addColumn('tracker_state', function ($row) {
+                switch ($row->tracker) {
+                    case "delivered":
+                        return "<span class='badge bg-success fs-6'>تم الاشعار</span>";
+                    case "shipped":
+                        return "<span class='badge bg-info fs-6'>تم تاكيد الطلب</span>";
+                    case "processing":
+                        return "<span class='badge bg-warning fs-6'>قيد المعالجة</span>";
+                    case null:
+                    case "":
+                        return "<span class='badge bg-secondary fs-6'>لم يتم التحديد</span>";
+                    case "pending":
+                        return "<span class='badge bg-secondary fs-6'>تم تاكيد الطلب</span>";
+                    default:
+                        return "<span class='badge bg-primary fs-6'>" . $row->tracker . "</span>";
+                }
+            })
+            ->addColumn('branch_actions', function ($row) {
+                if (!in_array($row->shipping_method, ['3', '4'])) {
+                    return '—';
+                }
+
+                $tracker = $row->tracker ?? 'pending';
+                $detailsBtn = '<a href="' . route('dashboard.orders.details', $row->id) . '" class="btn btn-sm btn-info">
+                    <i class="fa fa-eye"></i> التفاصيل
+                </a>';
+
+                // Notification button color based on tracker state
+                $notifyBtnClass = '';
+                $notifyText = '';
+                $disabled = '';
+
+                switch ($tracker) {
+                    case 'delivered':
+                        $notifyBtnClass = 'btn-success';
+                        $notifyText = '<i class="fa fa-check"></i> تم الإشعار';
+                        $disabled = 'disabled';
+                        break;
+                    case 'shipped':
+                        $notifyBtnClass = 'btn-warning';
+                        $notifyText = '<i class="fa fa-bell"></i> إرسال إشعار';
+                        break;
+                    case 'pending':
+                        $notifyBtnClass = 'btn-warning';
+                        $notifyText = '<i class="fa fa-bell"></i> إرسال إشعار';
+                        break;
+                    default:
+                        $notifyBtnClass = 'btn-secondary';
+                        $notifyText = '<i class="fa fa-clock"></i> في الانتظار';
+                        $disabled = 'disabled';
+                        break;
+                }
+
+                $notifyBtn = '<button class="btn btn-sm ' . $notifyBtnClass . ' send-notification" 
+                    data-order-id="' . $row->id . '" ' . $disabled . '>
+                    ' . $notifyText . '
+                </button>';
+
+                return '<div class="d-flex gap-1">' . $detailsBtn . $notifyBtn . '</div>';
+            })
+            ->rawColumns(['details', 'edit_order', 'change_status', 'image', 'state', 'addbarcode', 'admin_addbarcode', 'tracker_state', 'branch_actions'])
             ->toJson();
     }
 
@@ -199,7 +264,15 @@ class OrderController extends Controller
                 ];
                 $order->load(['shipping', 'orderDetails.products']);
 
-                Mail::to($order->user->email)->queue(new successPaid($order));
+                // Send success email only if customer email exists
+                if ($order->user && !empty($order->user->email)) {
+                    try {
+                        Mail::to($order->user->email)->send(new successPaid($order));
+                    } catch (\Exception $mailEx) {
+                        // Do not fail the whole state change due to mail issues
+                        // Optionally log if needed
+                    }
+                }
             } elseif ($state == "2") {
                 $order->status = "cancelled";
                 foreach ($order->orderDetails as $detail) {
@@ -215,13 +288,12 @@ class OrderController extends Controller
             DB::commit();
 
             return response()->json([
-                "success" => false,
+                "success" => true,
                 'code' => 200,
-                'msg' => "تنفيذ الاجراء"
+                'msg' => "تم تنفيذ الاجراء بنجاح"
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            logger($e->getMessage());
             return response()->json([
                 "success" => false,
                 'code' => 400,
@@ -275,7 +347,7 @@ class OrderController extends Controller
                 'barcode' => $order->barcode
             ];
 
-            Mail::to($order->user->email)->queue(new delivery($details));
+            Mail::to($order->user->email)->send(new delivery($details));
 
             return response()->json([
                 "success" => true,
@@ -284,7 +356,6 @@ class OrderController extends Controller
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            logger($e->getMessage());
             return response()->json([
                 "success" => false,
                 'code' => 400,
@@ -555,5 +626,154 @@ class OrderController extends Controller
             $order->update(['status' => 'success']);
         }
         return redirect()->to(route('dashboard.orders'));
+    }
+
+    public function sendBranchNotification(Request $request)
+    {
+        $request->validate([
+            'custom_message' => 'required|string|max:1000'
+        ], [
+            'custom_message.required' => 'الرسالة المخصصة مطلوبة',
+            'custom_message.max' => 'الرسالة لا يجب أن تتجاوز 1000 حرف'
+        ]);
+
+        $customMessage = $request->input('custom_message');
+
+        // Get branch orders that are ready but not yet delivered - optimized single query
+        $orders = Order::with(['user'])
+            ->whereIn('shipping_method', ['3', '4'])
+            ->where('status', 'success') // Only ready orders
+            ->where(function ($q) {
+                $q->whereNull('tracker')
+                    ->orWhere('tracker', '')
+                    ->orWhere('tracker', '!=', 'delivered');
+            })
+            ->orderBy('id', 'desc') // Get newest orders first
+            ->limit(10) // Send in batches
+            ->get();
+
+        if ($orders->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'لا يوجد طلبات جاهزة للإشعار ✅'
+            ]);
+        }
+
+        $sentCount = 0;
+        $failedCount = 0;
+        $errors = [];
+
+        foreach ($orders as $order) {
+            if ($order->user && $order->user->email) {
+                try {
+                    // Send email notification
+                    Mail::to($order->user->email)->send(new \App\Mail\BranchNotification($order, $customMessage));
+
+                    // Don't update tracker - keep original state
+                    $sentCount++;
+
+                    // Add delay to respect rate limits
+                    if ($sentCount < $orders->count()) {
+                        sleep(2); // 2 seconds delay between emails
+                    }
+                } catch (\Exception $e) {
+                    $failedCount++;
+                    $errors[] = "Order #{$order->id}: " . $e->getMessage();
+                }
+            } else {
+                $failedCount++;
+                $errors[] = "Order #{$order->id}: No email address";
+            }
+        }
+
+        $remainingOrders = Order::whereIn('shipping_method', ['3', '4'])
+            ->where('status', 'success')
+            ->where(function ($q) {
+                $q->whereNull('tracker')
+                    ->orWhere('tracker', '')
+                    ->orWhere('tracker', '!=', 'delivered');
+            })
+            ->count();
+
+        $message = "تم إرسال {$sentCount} إشعار بنجاح.";
+
+        if ($failedCount > 0) {
+            $message .= " فشل في إرسال {$failedCount} إشعار.";
+        }
+
+        $message .= " يتبقى {$remainingOrders} طلب.";
+
+        return response()->json([
+            'success' => $sentCount > 0,
+            'message' => $message,
+            'errors' => $errors,
+            'sent_count' => $sentCount,
+            'failed_count' => $failedCount,
+            'remaining_count' => $remainingOrders
+        ]);
+    }
+
+    public function sendIndividualNotification(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'custom_message' => 'required|string|max:1000'
+        ], [
+            'order_id.required' => 'رقم الطلب مطلوب',
+            'order_id.exists' => 'الطلب غير موجود',
+            'custom_message.required' => 'الرسالة المخصصة مطلوبة',
+            'custom_message.max' => 'الرسالة لا يجب أن تتجاوز 1000 حرف'
+        ]);
+
+        $order = Order::with(['user'])->findOrFail($request->order_id);
+
+        // Check if it's a branch order
+        if (!in_array($order->shipping_method, ['3', '4'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذا الطلب ليس طلب فرع'
+            ], 400);
+        }
+
+        // Check if order is ready for notification
+        if ($order->status !== 'success') {
+            return response()->json([
+                'success' => false,
+                'message' => 'الطلب غير جاهز للإشعار'
+            ], 400);
+        }
+
+        // Check if already notified
+        if ($order->tracker === 'delivered') {
+            return response()->json([
+                'success' => false,
+                'message' => 'تم إرسال الإشعار لهذا الطلب مسبقاً'
+            ], 400);
+        }
+
+        if (!$order->user || !$order->user->email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يوجد بريد إلكتروني للعميل'
+            ], 400);
+        }
+
+        try {
+            // Send email notification
+            Mail::to($order->user->email)->send(new \App\Mail\BranchNotification($order, $request->custom_message));
+
+            // Update tracker to delivered after successful email sending
+            $order->update(['tracker' => 'delivered']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إرسال الإشعار بنجاح للطلب #' . $order->id
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في إرسال الإشعار: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

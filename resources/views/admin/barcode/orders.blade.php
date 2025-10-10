@@ -59,7 +59,7 @@
             </div>
         </div>
     @else
-        <div class="shipping-info">
+        <div>
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h5><i class="fa fa-list"></i> جميع الطلبات</h5>
@@ -69,42 +69,38 @@
                     <i class="fa fa-barcode fa-3x"></i>
                 </div>
             </div>
-        </div>
     @endif
 
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title mb-0">الطلبات والباركود</h6>
-                <div class="dropdown morphing scale-left">
-                    <a href="#" class="card-fullscreen" data-bs-toggle="tooltip" title="Card Full-Screen"><i
-                            class="icon-size-fullscreen"></i></a>
-                    <a href="#" class="more-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i
-                            class="fa fa-ellipsis-h"></i></a>
-                    <ul class="dropdown-menu shadow border-0 p-2">
-                        <li><a class="dropdown-item" href="#">File Info</a></li>
-                        <li><a class="dropdown-item" href="#">Copy to</a></li>
-                        <li><a class="dropdown-item" href="#">Move to</a></li>
-                        <li><a class="dropdown-item" href="#">Rename</a></li>
-                        <li><a class="dropdown-item" href="#">Block</a></li>
-                        <li><a class="dropdown-item" href="#">Delete</a></li>
-                    </ul>
+    <!-- Orders Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                @if (request('shipping') != 'branch')
+                    <div class="card-header bg-primary">
+                        <h6 class="card-title mb-0 text-white">
+                            <i class="fa fa-list"></i> الطلبات والباركود
+                        </h6>
+                    </div>
+                @endif
+                
+                <div class="card-body">
+                    <table class="table table-hover align-middle mb-0" id="myTable">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>الاسم</th>
+                                <th>الباركود</th>
+                                <th>أضافه الباركود</th>
+                                @if (request('shipping') === 'branch')
+                                    <th>حالة التتبع</th>
+                                    <th>الإجراءات</th>
+                                @endif
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            <div class="card-body">
-                <table class="table table-hover align-middle mb-0" id="myTable">
-                    <thead>
-                        <tr>
-                            <th>رقم الطلب</th>
-                            <th>الاسم</th>
-                            <th>الباركود</th>
-                            <th>أضافه الباركود</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
@@ -151,8 +147,86 @@
                         data: 'admin_addbarcode',
                         name: 'admin_addbarcode',
                     },
+                    @if (request('shipping') === 'branch')
+                    {
+                        data: 'tracker_state',
+                        name: 'tracker_state',
+                    },
+                    {
+                        data: 'branch_actions',
+                        name: 'branch_actions',
+                    },
+                    @endif
                 ],
             });
         });
+
+        // Individual notification button click
+        $(document).on('click', '.send-notification', function() {
+            const orderId = $(this).data('order-id');
+            const button = $(this);
+            
+            // Prompt for custom message
+            const customMessage = prompt('اكتب رسالة مخصصة للعميل:', 'طلبك جاهز للاستلام من الفرع');
+            
+            if (!customMessage || customMessage.trim() === '') {
+                alert('الرسالة المخصصة مطلوبة');
+                return;
+            }
+
+            // Disable button and show loading
+            button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> جاري الإرسال...');
+
+            $.post('{{ route('dashboard.orders.sendIndividualNotification') }}', {
+                    order_id: orderId,
+                    custom_message: customMessage.trim(),
+                    _token: '{{ csrf_token() }}'
+                })
+                .done(function(response) {
+                    alert(response.message);
+                    
+                    // Reload DataTable to show updated status
+                    $('#myTable').DataTable().ajax.reload();
+                })
+                .fail(function(xhr) {
+                    const response = xhr.responseJSON;
+                    alert(response?.message || 'حدث خطأ أثناء إرسال الإشعار');
+                })
+                .always(function() {
+                    // Re-enable button (will be updated by DataTable reload)
+                    button.prop('disabled', false);
+                });
+        });
+
+        // Handle status change dropdown
+        function handleStatusChange(selectElement) {
+            let selectedValue = selectElement.value;
+            if (selectedValue.startsWith("http")) {
+                window.location.href = selectedValue;
+            } else {
+                let orderId = selectElement.getAttribute('data-order-id');
+                
+                $.post('{{ route('dashboard.changestate') }}', {
+                    id: orderId,
+                    state: selectedValue,
+                    _token: '{{ csrf_token() }}'
+                })
+                .done(function(response) {
+                    if (response.success) {
+                        alert(response.msg);
+                        $('#myTable').DataTable().ajax.reload();
+                    } else {
+                        alert('حدث خطأ: ' + response.msg);
+                    }
+                })
+                .fail(function(xhr) {
+                    alert('حدث خطأ أثناء تحديث حالة الطلب');
+                })
+                .always(function() {
+                    // Reset dropdown
+                    selectElement.selectedIndex = 0;
+                });
+            }
+        }
     </script>
 @endsection
