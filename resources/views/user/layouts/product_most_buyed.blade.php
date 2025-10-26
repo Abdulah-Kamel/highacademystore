@@ -76,11 +76,22 @@
                 <div class="row">
                     <div class="col-12 text-center">
                         @if ($item->commit != null)
-                            <div class=" rounded-pill bg-danger bg-gradient-danger px-2 py-1">
+                            <div class=" rounded-2 bg-danger bg-gradient-danger px-2 py-1">
                                 <p class="text-white m-0">
                                     {{ $item->commit }}
                                 </p>
                             </div>
+                        @endif
+                        @if($item->state == 3)
+                          <div class="mt-3">
+                            <a href="https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23"
+                            class= "bg-success text-white px-2 py-1 rounded-2 "
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <i class="fab fa-whatsapp fa-lg"></i>
+                            تابع معانا
+                             </a>
+                          </div>
                         @endif
 
                     </div>

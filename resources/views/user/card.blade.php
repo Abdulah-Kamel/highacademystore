@@ -137,9 +137,9 @@ $discountAmount = session()->has('applied_discount')
                                         onchange="calculateTotal()">
                                         <option value="">اختر المحافظة</option>
                                         @foreach ($governoratesData as $governorate)
-                                            <option value="{{ $governorate['id'] }}"
-                                                gov-price="{{ $governorate['price'] }}">
-                                                {{ $governorate['governorate_name_ar'] }}
+                                            <option value="{{ $governorate->id }}"
+                                                gov-price="{{ $governorate->price }}">
+                                                {{ $governorate->governorate_name_ar }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -225,6 +225,14 @@ $discountAmount = session()->has('applied_discount')
                                     <div id="shipping_info" class="mt-3" style="display: none;">
                                         <p id="fee_row" class="fs-5"><strong>رسوم الخدمه:</strong> + <span
                                                 id="shipping_fee">0.00</span> جنيه</p>
+                                        <p id="home_cost_row" class="fs-5" style="display: none;">
+                                            <strong>تكلفة التوصيل للمنزل:</strong>
+                                            <span id="home_shipping_cost">0.00</span> جنيه
+                                        </p>
+                                        <p id="post_cost_row" class="fs-5" style="display: none;">
+                                            <strong>تكلفة التوصيل لمكتب البريد:</strong>
+                                            <span id="post_shipping_cost">0.00</span> جنيه
+                                        </p>
                                         <p id="address_row" class="fs-5"><strong>العنوان:</strong> <span
                                                 id="shipping_address">---</span></p>
                                         <p id="phones_row" class="fs-5"><strong>أرقام الهاتف:</strong> <span
@@ -336,11 +344,17 @@ $discountAmount = session()->has('applied_discount')
         @endphp
 
         <script>
+            const TAX_HOME = {{ $productTax }};
+            const TAX_POST = {{ $productSlowTax }};
+        </script>
+
+        <script>
             // Wait for the document to be fully loaded
             document.addEventListener('DOMContentLoaded', function() {
 
                 // --- Get data and elements from the page ---
                 const allShippingMethods = @json($shippingMethods);
+                const governoratesDataset = @json($governoratesData);
                 const governoratesSelect = document.getElementById('governorates');
                 const shippingSelect = document.getElementById('shipping_method');
 
@@ -353,11 +367,17 @@ $discountAmount = session()->has('applied_discount')
                     const wrapper = document.getElementById('nearpost_wrapper');
                     const npInput = document.getElementById('near_post');
                     const fee_row = document.getElementById('fee_row');
+                    const homeRow = document.getElementById('home_cost_row');
+                    const postRow = document.getElementById('post_cost_row');
+                    const homeValue = document.getElementById('home_shipping_cost');
+                    const postValue = document.getElementById('post_shipping_cost');
 
                     if (!m) {
                         // nothing selected → hide the whole panel
                         wrapper.style.display = 'none';
                         info.style.display = 'none';
+                        if (homeRow) homeRow.style.display = 'none';
+                        if (postRow) postRow.style.display = 'none';
 
                         return;
                     }
@@ -375,6 +395,41 @@ $discountAmount = session()->has('applied_discount')
                     }
 
                     document.getElementById('shipping_fee').innerText = Number(m.fee).toFixed(2);
+
+                    const govId = governoratesSelect.value;
+                    const matchedGov = governoratesDataset.find(g => g.id == govId);
+                    const rawHomeBase = matchedGov ? (matchedGov.home_shipping_price ?? matchedGov.price) : null;
+                    const rawPostBase = matchedGov ? (matchedGov.post_shipping_price ?? matchedGov.price) : null;
+                    const homeBase = rawHomeBase !== null && rawHomeBase !== undefined ? Number(rawHomeBase) : NaN;
+                    const postBase = rawPostBase !== null && rawPostBase !== undefined ? Number(rawPostBase) : NaN;
+                    const baseFee = Number(m.fee ?? 0);
+
+                    if (homeRow && postRow) {
+                        homeRow.style.display = 'none';
+                        postRow.style.display = 'none';
+
+                        if (m.type === 'home' && govId) {
+                            homeRow.style.display = 'block';
+                            homeValue.innerText = (baseFee + homeBase + TAX_HOME).toFixed(2);
+
+                            if (Number.isFinite(postBase)) {
+                                postRow.style.display = 'block';
+                                postValue.innerText = (baseFee + postBase + TAX_POST).toFixed(2);
+                            } else {
+                                postRow.style.display = 'none';
+                            }
+                        } else if (m.type === 'post' && govId) {
+                            postRow.style.display = 'block';
+                            postValue.innerText = (baseFee + postBase + TAX_POST).toFixed(2);
+
+                            if (Number.isFinite(homeBase)) {
+                                homeRow.style.display = 'block';
+                                homeValue.innerText = (baseFee + homeBase + TAX_HOME).toFixed(2);
+                            } else {
+                                homeRow.style.display = 'none';
+                            }
+                        }
+                    }
 
                     // show/hide address & phones rows
                     const addr = document.getElementById('address_row');
@@ -437,6 +492,7 @@ $discountAmount = session()->has('applied_discount')
         <script>
             const shippingMethods = @json($shippingMethods);
             const governoratesData = @json($governoratesData);
+            const citiesData = @json($citiesData);
             const shippingSelect = document.getElementById('shipping_method');
 
             function setupPaymentHandler(buttonId, routeUrl, extraFormId = null) {
@@ -546,27 +602,54 @@ $discountAmount = session()->has('applied_discount')
                 let grandTotal = discountedSubtotal;
 
                 // إيجاد طريقة الشحن من الـ ID
-                if (!method) return;
-                let deliveryFee = Number(method.fee);
-                // لو استلام من المكتبة → التوصيل = صفر
-                // if (method.type === 'branch') {
-                //     deliveryFee = 0;
-                // } else {
-                // نحسب سعر المحافظة (لو متاح)
-                const gov = governoratesData.find(g => g.id == governorateId);
-                const govPrice = Number(gov?.price);
-
-                const taxFast = {{ $productTax }};
-                const taxNormal = {{ $productSlowTax }};
-                console.log("deliveryFee", deliveryFee, "govPrice", govPrice, "taxFast", taxFast, "taxNormal", taxNormal);
-                if (method.type === 'home') {
-                    deliveryFee += govPrice + taxFast;
-                } else if (method.type === 'post') {
-                    deliveryFee += govPrice + taxNormal;
+                if (!method) {
+                    updateCostRows(null, 0);
+                    return;
                 }
-                // }
+
+                let deliveryFee = Number(method.fee ?? 0);
+                const gov = governoratesData.find(g => g.id == governorateId);
+                const rawHomeBase = gov ? (gov.home_shipping_price ?? gov.price) : null;
+                const rawPostBase = gov ? (gov.post_shipping_price ?? gov.price) : null;
+                const homeBase = rawHomeBase !== null && rawHomeBase !== undefined ? Number(rawHomeBase) : NaN;
+                const postBase = rawPostBase !== null && rawPostBase !== undefined ? Number(rawPostBase) : NaN;
+                let appliedTax = 0;
+
+                if (method.type === 'home' && Number.isNaN(homeBase)) {
+                    updateCostRows(null, 0);
+                    return;
+                }
+
+                if (method.type === 'post' && Number.isNaN(postBase)) {
+                    updateCostRows(null, 0);
+                    return;
+                }
+
+                if (method.type === 'home') {
+                    appliedTax = TAX_HOME;
+                    deliveryFee += (Number.isNaN(homeBase) ? 0 : homeBase) + appliedTax;
+                    updateCostRows('home', deliveryFee);
+                } else if (method.type === 'post') {
+                    appliedTax = TAX_POST;
+                    deliveryFee += (Number.isNaN(postBase) ? 0 : postBase) + appliedTax;
+                    updateCostRows('post', deliveryFee);
+                } else {
+                    updateCostRows('branch', deliveryFee);
+                }
 
                 grandTotal = discountedSubtotal + deliveryFee;
+
+                console.log('Shipping calculation', {
+                    method: method.type,
+                    methodName: method.name,
+                    governorateId: governorateId || null,
+                    baseFee: Number(method.fee ?? 0),
+                    homeBase: Number.isNaN(homeBase) ? null : homeBase,
+                    postBase: Number.isNaN(postBase) ? null : postBase,
+                    appliedTax,
+                    deliveryFee,
+                    grandTotal
+                });
 
                 // تحديث الواجهة
                 document.querySelectorAll("#delivery").forEach(el => {
@@ -575,6 +658,36 @@ $discountAmount = session()->has('applied_discount')
                 document.querySelectorAll("#all").forEach(el => {
                     el.innerText = `جنيه ${grandTotal.toFixed(2)}`;
                 });
+                const shippingTaxEl = document.getElementById('shippingTax');
+                if (shippingTaxEl) {
+                    shippingTaxEl.innerText = `جنيه ${appliedTax.toFixed(2)}`;
+                }
+            }
+
+            function updateCostRows(type, cost) {
+                const homeRow = document.getElementById('home_cost_row');
+                const postRow = document.getElementById('post_cost_row');
+                const homeValue = document.getElementById('home_shipping_cost');
+                const postValue = document.getElementById('post_shipping_cost');
+
+                if (!homeRow || !postRow) {
+                    return;
+                }
+
+                homeRow.style.display = 'none';
+                postRow.style.display = 'none';
+
+                if (!type || !Number.isFinite(cost)) {
+                    return;
+                }
+
+                if (type === 'home') {
+                    homeRow.style.display = 'block';
+                    homeValue.innerText = cost.toFixed(2);
+                } else if (type === 'post') {
+                    postRow.style.display = 'block';
+                    postValue.innerText = cost.toFixed(2);
+                }
             }
 
 
@@ -587,13 +700,13 @@ $discountAmount = session()->has('applied_discount')
         $citiId;
         if ($orders !== null) {
             foreach ($governoratesData as $governorate) {
-                if ($orders->governorate == $governorate['governorate_name_ar']) {
-                    $addressId = $governorate['id'];
+                if ($orders->governorate == $governorate->governorate_name_ar) {
+                    $addressId = $governorate->id;
                 }
             }
             foreach ($citiesData as $cities) {
-                if ($orders->city == $cities['city_name_ar']) {
-                    $citiId = $cities['id'];
+                if ($orders->city == $cities->name_ar) {
+                    $citiId = $cities->id;
                 }
             }
         }
@@ -616,7 +729,7 @@ $discountAmount = session()->has('applied_discount')
                         filteredCities.forEach(city => {
                             const option = document.createElement('option');
                             option.value = city.id;
-                            option.textContent = city.city_name_ar;
+                            option.textContent = city.name_ar;
                             citiesSelect.appendChild(option);
                         });
                     } else {

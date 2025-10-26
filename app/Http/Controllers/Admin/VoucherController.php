@@ -20,18 +20,25 @@ class VoucherController extends Controller
 
   public function datatable(Coupon $coupon)
 {
-    $vouchers = $coupon->vouchers;
+    $vouchers = $coupon->vouchers()->with('user')->get();
     $vouchers = $vouchers->reverse();
     return DataTables::of($vouchers)
         ->addColumn('code', function ($row) {
             return $row->code;
-        })->addColumn('image', function ($row) {
+        })
+        ->addColumn('image', function ($row) {
             if($row->image !== null){
             $image = '<img src="' . url($row->image). '" alt="coupon-image" style="height:80px;width:100px" class="rounded">';
             return $image;
             }else{
                 return null;
             }
+        })
+        ->addColumn('user_name', function ($row) {
+            return $row->user ? $row->user->name : '<span class="text-muted">غير محدد</span>';
+        })
+        ->addColumn('user_phone', function ($row) {
+            return $row->user ? $row->user->phone : '<span class="text-muted">غير محدد</span>';
         })
        ->addColumn('state', function ($row) {
     if ($row->is_used) {
@@ -47,7 +54,7 @@ class VoucherController extends Controller
          
             return $edit . ' ' . $delete;
         })
-        ->rawColumns(['operation' => 'operation', 'state' => 'state', "image" => "image"])
+        ->rawColumns(['operation' => 'operation', 'state' => 'state', "image" => "image", 'user_name' => 'user_name', 'user_phone' => 'user_phone'])
         ->toJson();
 }
 

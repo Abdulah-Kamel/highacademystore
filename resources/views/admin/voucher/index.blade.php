@@ -32,6 +32,8 @@
                             <th>#</th>
                             <th>الكوبون</th>
                             <th>ألصورة</th>
+                            <th>اسم المستخدم</th>
+                            <th>رقم الهاتف</th>
                             <th>الحالة</th>
                             <th>العمليات</th>
                         </tr>
@@ -77,6 +79,14 @@
             {
                 data: 'image',
                 name: 'image'
+            },
+            {
+                data: 'user_name',
+                name: 'user_name'
+            },
+            {
+                data: 'user_phone',
+                name: 'user_phone'
             },
             {
                 data: 'state',

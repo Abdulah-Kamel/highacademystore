@@ -90,126 +90,193 @@ class CartController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse (JSON)
      */
-    public function store(Request $request)
-    {
-        $product_qty = $request->input('product_qty');
-        $product_id = $request->input('product_id');
-        $object_product = Product::findorfail($product_id);
-        $product = Product::getProductByCart($product_id);
+ public function store(Request $request)
+{
+    $product_qty = $request->input('product_qty');
+    $product_id = $request->input('product_id');
+    $object_product = Product::findOrFail($product_id);
+    $product = Product::getProductByCart($product_id);
 
-        // Check stock availability for all products, regardless of state
-        if (!$product || $product[0]['state'] == 0 || $product[0]['quantity'] == 0 || $product[0]['quantity'] < $product_qty) {
+    // تحقق من توافر المنتج والمخزون
+    if (!$product || $product[0]['state'] == 0 || $product[0]['quantity'] == 0 || $product[0]['quantity'] < $product_qty) {
+        return response()->json([
+            'status' => false,
+            'message' => "العنصر غير متاح حاليًا أو الكمية غير كافية"
+        ]);
+    }
+
+    $cart = Cart::instance('shopping');
+    $cartContent = $cart->content();
+
+    // لو المنتج الحالي حجز
+    if ($product[0]['state'] == 2) {
+        $existingReservation = $cartContent->first(function ($item) use ($product_id, $request) {
+            return $item->id == $product_id && $item->options->color == $request->color && $item->options->size == $request->size;
+        });
+
+        // السلة فيها منتج آخر غير نفس الحجز
+        if ($cart->count() > 0 && !$existingReservation) {
             return response()->json([
                 'status' => false,
-                'message' => "العنصر غير متاح حاليًا أو الكمية غير كافية"
+                'message' => "لا يمكن إضافة منتج حجز مع منتجات أخرى في نفس السلة.",
             ]);
         }
 
-        // [ADDED] Check if user is trying to add more than 30 in a single addition
-        if ($product_qty > $object_product->max_qty_for_order) {
-            return response()->json([
-                'status' => false,
-                'message' => "عفوا، لا يمكنك إضافة أكثر من {$object_product->max_qty_for_order} لهذا المنتج.",
-            ]);
-        }
+        // تحديث الكمية لو نفس المنتج موجود
+        if ($existingReservation) {
+            $newQty = $existingReservation->qty + $product_qty;
 
-        // Calculate Price (Considering Offer)
-        if ($product[0]['have_offer'] == 1) {
-            if ($product[0]['offer_type'] == 'percentage') {
-                $price = $product[0]['price'] - ($product[0]['price'] * $product[0]['offer_value']) / 100;
-            } else {
-                $price = $product[0]['price'] - $product[0]['offer_value'];
-            }
-        } else {
-            $price = $product[0]['price'];
-        }
-
-        // Check if Product Already Exists in Cart
-        $existingCartItem = Cart::instance('shopping')->search(function ($cartItem) use ($product_id, $request) {
-            return $cartItem->id == $product_id && $cartItem->options->color == $request->color && $cartItem->options->size == $request->size;;
-        })->first();
-
-        if ($existingCartItem) {
-            // Update Quantity Instead of Adding a New Row
-            $newQuantity = $existingCartItem->qty + $product_qty;
-            if ($newQuantity > $object_product->max_qty_for_order) {
+            if ($newQty > $object_product->max_qty_for_order) {
                 return response()->json([
                     'status' => false,
                     'message' => "عفوا، لا يمكنك إضافة أكثر من {$object_product->max_qty_for_order} لهذا المنتج.",
                 ]);
             }
 
-            // Ensure Stock is Available for additional quantity
-            if ($product[0]['quantity'] < $product_qty) {
+            if ($product[0]['quantity'] < $newQty) {
                 return response()->json([
                     'status' => false,
                     'message' => "لا توجد هذه الكمية من هذا العنصر، الكمية المتاحة هي " . $product[0]['quantity']
                 ]);
             }
 
-            Cart::instance('shopping')->update($existingCartItem->rowId, $newQuantity);
+            $cart->update($existingReservation->rowId, $newQty);
 
-            // Deduct only the additional quantity being added
             $product_quantity = Product::find($product_id);
             $oldState = $product_quantity->state;
-            // Always deduct quantity but prevent negative values
-            $newQuantity = $product_quantity->quantity - $product_qty;
-            $product_quantity->quantity = max(0, $newQuantity); // Prevent negative quantities
+            $product_quantity->quantity = max(0, $product_quantity->quantity - $product_qty);
 
-            // Only update state if not state 2
             if ($product_quantity->state != 2) {
                 $newState = ($product_quantity->quantity > 0) ? 1 : 0;
                 if ($oldState != $newState) {
                     $product_quantity->state = $newState;
-                    $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Update');
+                    $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Reservation Update');
                 }
             }
             $product_quantity->save();
-        } else {
-            $max_quantity = Product::find($product_id)->max_qty_for_order;
-            // Add New Item to Cart
-            Cart::instance('shopping')->add(
-                $product_id,
-                $product[0]['name'],
-                $product_qty,
-                $price,
-                ['maxQuantity' => $max_quantity, 'size' => $request->size, 'color' => $request->color, 'added_at' => now()->timestamp]
-            )
-                ->associate('App\Models\Product');
 
-            // Deduct Stock for new item
-            $product_quantity = Product::find($product_id);
-            $oldState = $product_quantity->state;
-            // Always deduct quantity but prevent negative values
-            $newQuantity = $product_quantity->quantity - $product_qty;
-            $product_quantity->quantity = max(0, $newQuantity); // Prevent negative quantities
-
-            // Only update state if not state 2
-            if ($product_quantity->state != 2) {
-                $newState = ($product_quantity->quantity > 0) ? 1 : 0;
-                if ($oldState != $newState) {
-                    $product_quantity->state = $newState;
-                    $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Addition');
-                }
-            }
-            $product_quantity->save();
+            return response()->json([
+                'status' => true,
+                'message' => "تم تحديث الكمية بنجاح!",
+                'cart_count' => $cart->count(),
+                'total' => $cart->subtotal(),
+            ]);
         }
-
-        // Response
-        $response = [
-            'status' => true,
-            'product_id' => $product_id,
-            'total' => Cart::subtotal(),
-            'cart_count' => Cart::instance('shopping')->count(),
-            'message' => "تم تحديث السلة بنجاح!"
-        ];
-
-        if ($request->ajax()) {
-            $response['header'] = view('user.layouts.nav')->render();
-        }
-
-        return response()->json($response);
     }
+
+    // ✅ تحقق هنا: لو السلة فيها منتج حجز (state = 2) والمنتج الحالي مش حجز → رجع خطأ
+    if ($product[0]['state'] != 2 && $cart->count() > 0) {
+        foreach ($cartContent as $item) {
+            $p = Product::find($item->id);
+            if ($p && $p->state == 2) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "لا يمكن إضافة منتجات أخري مع منتج محجوز",
+                ]);
+            }
+        }
+    }
+
+    // تحقق من الحد الأقصى للكمية
+    if ($product_qty > $object_product->max_qty_for_order) {
+        return response()->json([
+            'status' => false,
+            'message' => "عفوا، لا يمكنك إضافة أكثر من {$object_product->max_qty_for_order} لهذا المنتج.",
+        ]);
+    }
+
+    // حساب السعر مع العرض إن وجد
+    if ($product[0]['have_offer'] == 1) {
+        if ($product[0]['offer_type'] == 'percentage') {
+            $price = $product[0]['price'] - ($product[0]['price'] * $product[0]['offer_value']) / 100;
+        } else {
+            $price = $product[0]['price'] - $product[0]['offer_value'];
+        }
+    } else {
+        $price = $product[0]['price'];
+    }
+
+    // تحقق لو المنتج موجود بالفعل في السلة
+    $existingCartItem = Cart::instance('shopping')->search(function ($cartItem) use ($product_id, $request) {
+        return $cartItem->id == $product_id && $cartItem->options->color == $request->color && $cartItem->options->size == $request->size;
+    })->first();
+
+    if ($existingCartItem) {
+        $newQuantity = $existingCartItem->qty + $product_qty;
+
+        if ($newQuantity > $object_product->max_qty_for_order) {
+            return response()->json([
+                'status' => false,
+                'message' => "عفوا، لا يمكنك إضافة أكثر من {$object_product->max_qty_for_order} لهذا المنتج.",
+            ]);
+        }
+
+        if ($product[0]['quantity'] < $product_qty) {
+            return response()->json([
+                'status' => false,
+                'message' => "لا توجد هذه الكمية من هذا العنصر، الكمية المتاحة هي " . $product[0]['quantity']
+            ]);
+        }
+
+        Cart::instance('shopping')->update($existingCartItem->rowId, $newQuantity);
+
+        $product_quantity = Product::find($product_id);
+        $oldState = $product_quantity->state;
+        $product_quantity->quantity = max(0, $product_quantity->quantity - $product_qty);
+
+        if ($product_quantity->state != 2) {
+            $newState = ($product_quantity->quantity > 0) ? 1 : 0;
+            if ($oldState != $newState) {
+                $product_quantity->state = $newState;
+                $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Update');
+            }
+        }
+        $product_quantity->save();
+    } else {
+        $max_quantity = $object_product->max_qty_for_order;
+
+        Cart::instance('shopping')->add(
+            $product_id,
+            $product[0]['name'],
+            $product_qty,
+            $price,
+            [
+                'maxQuantity' => $max_quantity,
+                'size' => $request->size,
+                'color' => $request->color,
+                'added_at' => now()->timestamp
+            ]
+        )->associate('App\Models\Product');
+
+        $product_quantity = Product::find($product_id);
+        $oldState = $product_quantity->state;
+        $product_quantity->quantity = max(0, $product_quantity->quantity - $product_qty);
+
+        if ($product_quantity->state != 2) {
+            $newState = ($product_quantity->quantity > 0) ? 1 : 0;
+            if ($oldState != $newState) {
+                $product_quantity->state = $newState;
+                $this->logStateChange($product_quantity, $oldState, $newState, 'Cart Addition');
+            }
+        }
+        $product_quantity->save();
+    }
+
+    // الرد النهائي
+    $response = [
+        'status' => true,
+        'product_id' => $product_id,
+        'total' => Cart::subtotal(),
+        'cart_count' => Cart::instance('shopping')->count(),
+        'message' => "تم تحديث السلة بنجاح!"
+    ];
+
+    if ($request->ajax()) {
+        $response['header'] = view('user.layouts.nav')->render();
+    }
+
+    return response()->json($response);
+}
 
     /**
      * Display the specified resource.

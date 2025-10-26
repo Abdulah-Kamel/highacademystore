@@ -3,8 +3,11 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DiscountController;
+use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\GovernorateController;
 use App\Http\Controllers\Admin\MainCategoriesController;
 use App\Http\Controllers\Admin\MinAdminController;
 use App\Http\Controllers\Admin\OfferController;
@@ -201,6 +204,38 @@ Route::group(
             Route::get('/shipping-methods/{shipping_method}/edit', [ShippingMethodController::class, 'edit'])->name('shipping-methods.edit');
             Route::match(['put', 'patch'], '/shipping-methods/{shipping_method}', [ShippingMethodController::class, 'update'])->name('shipping-methods.update');
             Route::delete('/shipping-methods/{shipping_method}', [ShippingMethodController::class, 'destroy'])->name('shipping-methods.destroy');
+
+            // FAQ Management
+            Route::get('/faqs', [FaqController::class, 'index'])->name('faqs');
+            Route::get('/faqs/datatable', [FaqController::class, 'datatable'])->name('faqs.datatable');
+            Route::post('/faqs/cleanup-duplicates', [FaqController::class, 'cleanupDuplicates'])->name('faqs.cleanup-duplicates');
+            Route::get('/faqs/create', [FaqController::class, 'create'])->name('faqs.create');
+            Route::post('/faqs', [FaqController::class, 'store'])->name('faqs.store');
+            Route::get('/faqs/{faq}/edit', [FaqController::class, 'edit'])->name('faqs.edit');
+            Route::match(['put', 'patch'], '/faqs/{faq}', [FaqController::class, 'update'])->name('faqs.update');
+            Route::delete('/faqs/{faq}', [FaqController::class, 'destroy'])->name('faqs.destroy');
+
+
+            // Governorates Management
+            Route::get('governorates', [GovernorateController::class, 'index'])->name('governorates.index');
+            Route::get('/governorates/datatable', [GovernorateController::class, 'datatable'])->name('governorates.datatable');
+            Route::get('governorates/create', [GovernorateController::class, 'create'])->name('governorates.create');
+            Route::post('governorates', [GovernorateController::class, 'store'])->name('governorates.store');
+            Route::get('governorates/{governorate}', [GovernorateController::class, 'show'])->name('governorates.show');
+            Route::get('governorates/{governorate}/edit', [GovernorateController::class, 'edit'])->name('governorates.edit');
+            Route::put('governorates/{governorate}', [GovernorateController::class, 'update'])->name('governorates.update');
+            Route::delete('governorates/{governorate}', [GovernorateController::class, 'destroy'])->name('governorates.destroy');
+
+            // Cities Management  
+            Route::get('/cities/datatable', [CityController::class, 'datatable'])->name('cities.datatable');
+            Route::get('cities', [CityController::class, 'index'])->name('cities.index');
+            Route::get('cities/create', [CityController::class, 'create'])->name('cities.create');
+            Route::post('cities', [CityController::class, 'store'])->name('cities.store');
+            Route::get('cities/{city}', [CityController::class, 'show'])->name('cities.show');
+            Route::get('cities/{city}/edit', [CityController::class, 'edit'])->name('cities.edit');
+            Route::put('cities/{city}', [CityController::class, 'update'])->name('cities.update');
+            Route::delete('cities/{city}', [CityController::class, 'destroy'])->name('cities.destroy');
+            Route::post('/cities/import-json', [CityController::class, 'importFromJson'])->name('cities.import-json');
         });
     }
 );

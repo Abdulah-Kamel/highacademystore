@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use App\Models\Discount;
+use App\Models\Governorate;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\ShippingMethod;
@@ -11,7 +13,6 @@ use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -46,8 +47,8 @@ class CheckoutController extends Controller
             'mobile'             => ['required', 'string', 'regex:/^01[0125][0-9]{8}$/'],
             'temp_mobile'        => ['required', 'string', 'regex:/^01[0125][0-9]{8}$/'],
             'shipping_method_id' => ['required', 'exists:shipping_methods,id'],
-            'government'         => ['required', 'integer'],
-            'city'               => ['required', 'integer'],
+            'government'         => ['required', 'integer', 'exists:governorates,id'],
+            'city'               => ['required', 'integer', 'exists:cities,id'],
             'address'            => ['required', 'string'],
             'near_post'          => ['nullable', 'string'],  // optional
         ];
@@ -77,19 +78,17 @@ class CheckoutController extends Controller
             return [$address, $baseFee];
         }
 
-        // 2) Load gov/city JSON
-        $govs   = json_decode(File::get(storage_path('cities/governorates.json')), true);
-        $cities = json_decode(File::get(storage_path('cities/cities.json')), true);
-
-        $gov  = collect($govs)->firstWhere('id', $request->government);
-        $city = collect($cities)->firstWhere('id', $request->city);
+        // 2) Fetch governorate & city from DB
+        $gov = Governorate::find($request->government);
+        $city = City::where('id', $request->city)
+            ->when($gov, fn($query) => $query->where('governorate_id', $gov->id))
+            ->first();
 
         if (! $gov || ! $city) {
             throw new \Exception("Invalid governorate or city.");
         }
 
-        $address = $gov['governorate_name_ar'] . " - " . $city['city_name_ar'];
-        $base    = $gov['price'];
+        $address = $gov->name_ar . ' - ' . $city->name_ar;
 
         // نفس طريقة الحساب القديمة
         $taxFast   = Cart::instance('shopping')->content()
@@ -98,9 +97,11 @@ class CheckoutController extends Controller
             ->sum(fn($p) => $p->qty * ($p->model->slowTax ?? 10));
 
         if ($method->type === 'home') {
-            $fee = $base + $taxFast + $baseFee;
-        } else { // post
-            $fee = $base + $taxNormal + $baseFee;
+            $fee = $gov->home_cost + $taxFast + $baseFee;
+        } elseif ($method->type === 'post') {
+            $fee = $gov->post_cost + $taxNormal + $baseFee;
+        } else {
+            $fee = $baseFee;
         }
 
         return [$address, $fee];

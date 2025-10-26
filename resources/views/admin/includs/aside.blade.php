@@ -34,7 +34,7 @@
                     <option value="3">Luno Sass App</option>
                 </select>
                 <button class="btn bg-primary text-white rounded-circle" data-bs-toggle="modal"
-                        data-bs-target="#CreateNew" type="button"><i class="fa fa-plus"></i></button>
+                    data-bs-target="#CreateNew" type="button"><i class="fa fa-plus"></i></button>
             </div>
         </div>
 
@@ -47,12 +47,12 @@
                 </li>
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(2) == 'dashboard' && request()->segment(3) == '' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">My Dashboard</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -62,18 +62,19 @@
                         id="my_dashboard">
                         <li>
                             <a class="ms-link {{ request()->segment(2) == 'dashboard' && request()->segment(3) == '' ? 'active' : '' }}"
-                               href="{{ route('dashboard.index') }}">Dashboard</a></li>
+                                href="{{ route('dashboard.index') }}">Dashboard</a>
+                        </li>
                     </ul>
                 </li>
                 {{-- // مراحل التعلمية Routes --}}
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'education_stages' ? 'active' : '' }} {{ request()->segment(3) == 'stages' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard2" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard2" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">المراحل التعلمية</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -82,10 +83,12 @@
                         id="my_dashboard2">
                         <li>
                             <a class="ms-link  {{ request()->segment(3) == 'education-stages' && request()->segment(4) == '' ? 'active' : '' }}"
-                               href="{{ route('dashboard.education_stages') }}">المراحل التعلمية</a></li>
+                                href="{{ route('dashboard.education_stages') }}">المراحل التعلمية</a>
+                        </li>
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'stages' && request()->segment(4) == 'create' ? 'active' : '' }}"
-                               href="{{ route('dashboard.create.education_stages') }}">اضافه مرحله تعليميه</a></li>
+                                href="{{ route('dashboard.create.education_stages') }}">اضافه مرحله تعليميه</a>
+                        </li>
                     </ul>
                 </li>
 
@@ -93,12 +96,12 @@
                 {{-- // slider Routes --}}
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'sliders' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard3" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard3" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="M8 3.293l6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="M8 3.293l6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">الصفوف الدراسية</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -107,21 +110,23 @@
                         id="my_dashboard3">
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'sliders' && request()->segment(4) == '' ? 'active' : '' }}"
-                               href="{{ route('dashboard.slider') }}">الصفوف الدراسية</a></li>
+                                href="{{ route('dashboard.slider') }}">الصفوف الدراسية</a>
+                        </li>
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'sliders' && request()->segment(4) == 'create' ? 'active' : '' }}"
-                               href="{{ route('dashboard.create.slider') }}">اضافه صف دراسي</a></li>
+                                href="{{ route('dashboard.create.slider') }}">اضافه صف دراسي</a>
+                        </li>
                     </ul>
                 </li>
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'minadmin' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard10" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard10" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="M8 3.293l6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="M8 3.293l6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">min admin</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -130,21 +135,23 @@
                         id="my_dashboard10">
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'minadmin' && request()->segment(4) == '' ? 'active' : '' }}"
-                               href="{{ route('dashboard.minadmin') }}">الحسابات</a></li>
+                                href="{{ route('dashboard.minadmin') }}">الحسابات</a>
+                        </li>
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'minadmin' && request()->segment(4) == 'create' ? 'active' : '' }}"
-                               href="{{ route('dashboard.create.minadmin') }}">اضافه حساب جديد </a></li>
+                                href="{{ route('dashboard.create.minadmin') }}">اضافه حساب جديد </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'vouchers' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard11" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard11" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="M8 3.293l6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="M8 3.293l6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">طلبات الكوبنات</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -153,7 +160,8 @@
                         id="my_dashboard11">
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'vouchers' && request()->segment(4) == '' ? 'active' : '' }}"
-                               href="{{ route('dashboard.voucher_order') }}">الطلبات</a></li>
+                                href="{{ route('dashboard.voucher_order') }}">الطلبات</a>
+                        </li>
                     </ul>
                 </li>
 
@@ -161,13 +169,13 @@
                 {{-- // Category Routes --}}
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'categories' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard4" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard4" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">المواد</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -176,23 +184,25 @@
                         id="my_dashboard4">
                         <li>
                             <a class="ms-link  {{ request()->segment(3) == 'categories' && request()->segment(4) == '' ? 'active' : '' }}"
-                               href="{{ route('dashboard.category') }}">المواد</a></li>
+                                href="{{ route('dashboard.category') }}">المواد</a>
+                        </li>
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'categories' && request()->segment(4) == 'create' ? 'active' : '' }}"
-                               href="{{ route('dashboard.create.category') }}">اضافه ماده</a></li>
+                                href="{{ route('dashboard.create.category') }}">اضافه ماده</a>
+                        </li>
                     </ul>
                 </li>
 
                 {{-- Vouchers Routes --}}
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'coupons' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard5" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard5" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">اكواد المدرسين</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -201,10 +211,12 @@
                         id="my_dashboard5">
                         <li>
                             <a class="ms-link  {{ request()->segment(3) == 'coupons' && request()->segment(4) == '' ? 'active' : '' }}"
-                               href="{{ route('dashboard.coupons') }}">الكوبونات</a></li>
+                                href="{{ route('dashboard.coupons') }}">الكوبونات</a>
+                        </li>
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'coupons' && request()->segment(4) == 'add' ? 'active' : '' }}"
-                               href="{{ route('dashboard.coupons.add') }}">اضافه كوبون</a></li>
+                                href="{{ route('dashboard.coupons.add') }}">اضافه كوبون</a>
+                        </li>
                     </ul>
                 </li>
 
@@ -212,13 +224,13 @@
                 {{-- // Product Routes --}}
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'products' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard6" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard6" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">الكتب</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -227,22 +239,24 @@
                         id="my_dashboard6">
                         <li>
                             <a class="ms-link  {{ request()->segment(3) == 'products' && request()->segment(4) == '' ? 'active' : '' }}"
-                               href="{{ route('dashboard.product') }}">الكتب</a></li>
+                                href="{{ route('dashboard.product') }}">الكتب</a>
+                        </li>
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'products' && request()->segment(4) == 'create' ? 'active' : '' }}"
-                               href="{{ route('dashboard.create.product') }}">اضافه كتاب</a></li>
+                                href="{{ route('dashboard.create.product') }}">اضافه كتاب</a>
+                        </li>
                     </ul>
                 </li>
 
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'main_categories' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard20" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard20" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">الاقسام</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -250,22 +264,22 @@
                     <ul class="sub-menu collapse {{ request()->segment(3) == 'main_categories' ? 'show' : '' }}"
                         id="my_dashboard20">
                         <li><a class="ms-link  {{ request()->segment(3) == 'main_categories' }}"
-                               href="{{ route('dashboard.main_categories') }}">الاقسام</a></li>
+                                href="{{ route('dashboard.main_categories') }}">الاقسام</a></li>
                         <li><a class="ms-link {{ request()->segment(3) == 'main_categories' }}"
-                               href="{{ route('dashboard.create.main_categories') }}">اضافه قسم</a></li>
+                                href="{{ route('dashboard.create.main_categories') }}">اضافه قسم</a></li>
                     </ul>
                 </li>
 
                 {{-- // brands Routes --}}
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'teachers' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard7" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard7" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">المدرسين</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -274,21 +288,23 @@
                         id="my_dashboard7">
                         <li>
                             <a class="ms-link  {{ request()->segment(3) == 'teachers' && request()->segment(4) == '' ? 'active' : '' }}"
-                               href="{{ route('dashboard.teachers') }}">المدرسين</a></li>
+                                href="{{ route('dashboard.teachers') }}">المدرسين</a>
+                        </li>
                         <li>
                             <a class="ms-link {{ request()->segment(3) == 'teachers' && request()->segment(4) == 'create' ? 'active' : '' }}"
-                               href="{{ route('dashboard.create.teachers') }}">اضافه مدرس</a></li>
+                                href="{{ route('dashboard.create.teachers') }}">اضافه مدرس</a>
+                        </li>
                     </ul>
                 </li>
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'barcode' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard22" href="#">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard22" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">الطلبات</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -296,25 +312,25 @@
                     <ul class="sub-menu collapse {{ request()->segment(3) == 'barcode' ? 'show' : '' }}"
                         id="my_dashboard22">
                         <li><a class="ms-link  {{ request()->segment(3) == 'barcode' }}"
-                               href="{{ route('dashboard.orders') }}">الطلبات</a></li>
+                                href="{{ route('dashboard.orders') }}">الطلبات</a></li>
                         <li><a class="ms-link  {{ request()->segment(3) == 'barcode' }}"
-                               href="{{ route('dashboard.orders') }}?state=reserved"> الطلبات المحجوزة</a></li>
+                                href="{{ route('dashboard.orders') }}?state=reserved"> الطلبات المحجوزة</a></li>
                         <li><a class="ms-link  {{ request()->segment(3) == 'barcode' }}"
-                               href="{{ route('dashboard.orders') }}?state=pending"> الطلبات المعلقة</a></li>
+                                href="{{ route('dashboard.orders') }}?state=pending"> الطلبات المعلقة</a></li>
 
                         <li><a class="ms-link {{ request()->segment(3) == 'barcode' }}"
-                               href="{{ route('dashboard.orders.barcode') }}">الباركود</a></li>
+                                href="{{ route('dashboard.orders.barcode') }}">الباركود</a></li>
                     </ul>
                 </li>
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'offers' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard23" href="">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard23" href="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">العروض</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -322,20 +338,20 @@
                     <ul class="sub-menu collapse {{ request()->segment(3) == 'offers' ? 'show' : '' }}"
                         id="my_dashboard23">
                         <li><a class="ms-link  {{ request()->segment(3) == 'offers' }}"
-                               href="{{ route('dashboard.offers') }}">العروض</a></li>
+                                href="{{ route('dashboard.offers') }}">العروض</a></li>
                         <li><a class="ms-link {{ request()->segment(3) == 'offers' }}"
-                               href="{{ route('dashboard.create.offers') }}">اضافه عرض</a></li>
+                                href="{{ route('dashboard.create.offers') }}">اضافه عرض</a></li>
                     </ul>
                 </li>
                 <li class="collapsed">
                     <a class="m-link {{ request()->segment(3) == 'discount' ? 'active' : '' }}"
-                       data-bs-toggle="collapse" data-bs-target="#my_dashboard24" href="">
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard24" href="">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
-                             viewBox="0 0 16 16">
+                            viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
-                                  d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
                             <path class="var(--secondary-color)" fill-rule="evenodd"
-                                  d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
                         </svg>
                         <span class="ms-2">الخصومات</span>
                         <span class="arrow fa fa-angle-right ms-auto text-end"></span>
@@ -343,9 +359,9 @@
                     <ul class="sub-menu collapse {{ request()->segment(3) == 'discount' ? 'show' : '' }}"
                         id="my_dashboard24">
                         <li><a class="ms-link  {{ request()->segment(3) == 'discount' }}"
-                               href="{{ route('dashboard.discount') }}">الخصومات</a></li>
+                                href="{{ route('dashboard.discount') }}">الخصومات</a></li>
                         <li><a class="ms-link {{ request()->segment(3) == 'discount' }}"
-                               href="{{ route('dashboard.discount.create') }}">اضافه خصم</a></li>
+                                href="{{ route('dashboard.discount.create') }}">اضافه خصم</a></li>
                     </ul>
                 </li>
                 <li class="collapsed">
@@ -369,6 +385,68 @@
                                href="{{ route('dashboard.shipping-methods.create') }}">اضافه طريقة شحن</a></li>
                     </ul>
                 </li>
+                <li class="collapsed">
+                    <a class="m-link {{ request()->segment(3) == 'faqs' ? 'active' : '' }}" data-bs-toggle="collapse"
+                        data-bs-target="#my_dashboard26" href="">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
+                            <path class="var(--secondary-color)" fill-rule="evenodd"
+                                d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
+                        </svg>
+                        <span class="ms-2">الأسئلة الشائعة</span>
+                        <span class="arrow fa fa-angle-right ms-auto text-end"></span>
+                    </a>
+                    <ul class="sub-menu collapse {{ request()->segment(3) == 'faqs' ? 'show' : '' }}"
+                        id="my_dashboard26">
+                        <li><a class="ms-link  {{ request()->segment(3) == 'faqs' }}"
+                                href="{{ route('dashboard.faqs') }}">الأسئلة الشائعة</a></li>
+                        <li><a class="ms-link {{ request()->segment(3) == 'faqs' }}"
+                                href="{{ route('dashboard.faqs.create') }}">إضافة سؤال جديد</a></li>
+                    </ul>
+                </li>
+                {{-- // Governorates Routes --}}
+                <li class="collapsed">
+                    <a class="m-link {{ request()->segment(3) == 'governorates' ? 'active' : '' }}"
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard27" href="">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+                        </svg>
+                        <span class="ms-2">إدارة المحافظات</span>
+                        <span class="arrow fa fa-angle-right ms-auto text-end"></span>
+                    </a>
+                    <ul class="sub-menu collapse {{ request()->segment(3) == 'governorates' ? 'show' : '' }}"
+                        id="my_dashboard27">
+                        <li><a class="ms-link {{ request()->segment(3) == 'governorates' && request()->segment(4) == '' ? 'active' : '' }}"
+                                href="{{ route('dashboard.governorates.index') }}">المحافظات</a></li>
+                        <li><a class="ms-link {{ request()->segment(3) == 'governorates' && request()->segment(4) == 'create' ? 'active' : '' }}"
+                                href="{{ route('dashboard.governorates.create') }}">إضافة محافظة</a></li>
+                    </ul>
+                </li>
+
+                {{-- // Cities Routes --}}
+                <li class="collapsed">
+                    <a class="m-link {{ request()->segment(3) == 'cities' ? 'active' : '' }}"
+                        data-bs-toggle="collapse" data-bs-target="#my_dashboard28" href="">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H4z" />
+                        </svg>
+                        <span class="ms-2">إدارة المدن</span>
+                        <span class="arrow fa fa-angle-right ms-auto text-end"></span>
+                    </a>
+                    <ul class="sub-menu collapse {{ request()->segment(3) == 'cities' ? 'show' : '' }}"
+                        id="my_dashboard28">
+                        <li><a class="ms-link {{ request()->segment(3) == 'cities' && request()->segment(4) == '' ? 'active' : '' }}"
+                                href="{{ route('dashboard.cities.index') }}">المدن</a></li>
+                        <li><a class="ms-link {{ request()->segment(3) == 'cities' && request()->segment(4) == 'create' ? 'active' : '' }}"
+                                href="{{ route('dashboard.cities.create') }}">إضافة مدينة</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
 
@@ -376,45 +454,45 @@
         <ul class="menu-list nav navbar-nav flex-row text-center menu-footer-link">
             <li class="nav-item flex-fill p-2">
                 <a class="d-inline-block w-100 color-400" href="#" data-bs-toggle="modal"
-                   data-bs-target="#ScheduleModal" title="My Schedule">
+                    data-bs-target="#ScheduleModal" title="My Schedule">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16">
                         <path class="fill-secondary"
-                              d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                            d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
                         <path
-                            d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z"/>
+                            d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z" />
                         <path class="fill-secondary"
-                              d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"/>
+                            d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z" />
                     </svg>
                 </a>
             </li>
             <li class="nav-item flex-fill p-2">
                 <a class="d-inline-block w-100 color-400" href="#" data-bs-toggle="modal"
-                   data-bs-target="#MynotesModal" title="My notes">
+                    data-bs-target="#MynotesModal" title="My notes">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16">
                         <path class="fill-secondary"
-                              d="M1.5 0A1.5 1.5 0 0 0 0 1.5V13a1 1 0 0 0 1 1V1.5a.5.5 0 0 1 .5-.5H14a1 1 0 0 0-1-1H1.5z"/>
+                            d="M1.5 0A1.5 1.5 0 0 0 0 1.5V13a1 1 0 0 0 1 1V1.5a.5.5 0 0 1 .5-.5H14a1 1 0 0 0-1-1H1.5z" />
                         <path
-                            d="M3.5 2A1.5 1.5 0 0 0 2 3.5v11A1.5 1.5 0 0 0 3.5 16h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 16 9.586V3.5A1.5 1.5 0 0 0 14.5 2h-11zM3 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V9h-4.5A1.5 1.5 0 0 0 9 10.5V15H3.5a.5.5 0 0 1-.5-.5v-11zm7 11.293V10.5a.5.5 0 0 1 .5-.5h4.293L10 14.793z"/>
+                            d="M3.5 2A1.5 1.5 0 0 0 2 3.5v11A1.5 1.5 0 0 0 3.5 16h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 16 9.586V3.5A1.5 1.5 0 0 0 14.5 2h-11zM3 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V9h-4.5A1.5 1.5 0 0 0 9 10.5V15H3.5a.5.5 0 0 1-.5-.5v-11zm7 11.293V10.5a.5.5 0 0 1 .5-.5h4.293L10 14.793z" />
                     </svg>
                 </a>
             </li>
             <li class="nav-item flex-fill p-2">
                 <a class="d-inline-block w-100 color-400" href="#" data-bs-toggle="modal"
-                   data-bs-target="#RecentChat">
+                    data-bs-target="#RecentChat">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16">
                         <path
-                            d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                            d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
                         <path class="fill-secondary"
-                              d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                            d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
                     </svg>
                 </a>
             </li>
             <li class="nav-item flex-fill p-2">
                 <a class="d-inline-block w-100 color-400" href="./auth-signin.html" title="sign-out">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M7.5 1v7h1V1h-1z"/>
+                        <path d="M7.5 1v7h1V1h-1z" />
                         <path class="fill-secondary"
-                              d="M3 8.812a4.999 4.999 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812z"/>
+                            d="M3 8.812a4.999 4.999 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812z" />
                     </svg>
                 </a>
             </li>

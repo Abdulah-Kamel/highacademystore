@@ -257,10 +257,28 @@
 <li class="nav-item">
     <hr class="divider my-1">
 </li>
-<li class="nav-item d-flex align-items-center justify-content-center nav-link text-white"
-    onclick="location.href='{{ route('user.contact') }}'" style="cursor: pointer;">
-    <a href="{{ route('user.contact') }}" class="text-decoration-none">تواصل معنا</a>
-    <i class="fa-solid fa-envelope ms-1"></i>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle text-white d-flex align-items-center justify-content-center" href="#" id="contactDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        تواصل معنا
+        <i class="fa-solid fa-envelope ms-1"></i>
+    </a>
+    <ul class="dropdown-menu bg-dark" aria-labelledby="contactDropdown">
+        <li>
+            <a class="dropdown-item" href="https://www.facebook.com/highacademy2" target="_blank">
+                <i class="fab fa-facebook-f me-2"></i>فيسبوك
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="https://wa.me/201550234324" target="_blank">
+                <i class="fab fa-whatsapp me-2"></i>واتساب
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="https://www.whatsapp.com/channel/0029VbAlwWH8fewxAkAdCZ23" target="_blank">
+                <i class="fab fa-whatsapp me-2"></i>قناة واتساب
+            </a>
+        </li>
+    </ul>
 </li>
 
 @auth

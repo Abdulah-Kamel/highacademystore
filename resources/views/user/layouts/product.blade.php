@@ -81,7 +81,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-12 text-center">
-                        @if ($item->commit != null)
+                         @if ($item->commit != null)
                             <div class=" rounded-2 bg-danger bg-gradient-danger px-2 py-1">
                                 <p class="text-white m-0">
                                     {{ $item->commit }}
@@ -256,11 +256,23 @@
                         @if ($item->state == 1 && $item->quantity > 0)
 
                             <div class="col-12">
-                                <div class="mt-1 add-btn-container d-flex justify-content-center align-items-center w-100">
+                                <div
+                                    class="mt-1 add-btn-container d-flex justify-content-center align-items-center w-100">
                                     <a class="add_to_cart btn add-btn btn-square text-black px-4 py-4 rounded w-100"
-                                        id="add_to_cart{{ $item->id }}" data-quantity="1"
-                                        data-product-id="{{ $item->id }}">
+                                       id="add_to_cart{{ $item->id }}" data-quantity="1"
+                                       data-product-id="{{ $item->id }}">
                                         اضافة الى السلة
+                                    </a>
+                                </div>
+                            </div>
+                        @elseif($item->state == 2)
+                            <div class="col-12">
+                                <div
+                                    class="mt-1 add-btn-container d-flex justify-content-center align-items-center w-100">
+                                    <a class="add_to_cart btn add-btn btn-square text-black px-4 py-4 rounded w-100"
+                                       id="add_to_cart{{ $item->id }}" data-quantity="1"
+                                       data-product-id="{{ $item->id }}">
+                                        احجز الان
                                     </a>
                                 </div>
                             </div>

@@ -20,12 +20,13 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log; // Update Log facade import
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use App\Models\City;
+use App\Models\Governorate;
 
 class UserController extends Controller
 {
@@ -175,8 +176,15 @@ class UserController extends Controller
         }
 
         $shippingMethods = ShippingMethod::all();
-        $governoratesData = json_decode(File::get(storage_path('cities/governorates.json')), true);
-        $citiesData = json_decode(File::get(storage_path('cities/cities.json')), true);
+        $governoratesData = Governorate::select(
+            'id',
+            'governorate_name_ar',
+            'governorate_name_en',
+            'price',
+            'home_shipping_price',
+            'post_shipping_price'
+        )->get();
+        $citiesData = City::select('id', 'governorate_id', 'name_ar', 'name_en', 'status')->get();
 
         return view('user.card', compact('governoratesData', 'citiesData', 'orders', 'shippingMethods'));
     }
