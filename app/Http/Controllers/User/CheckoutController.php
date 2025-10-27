@@ -90,11 +90,18 @@ class CheckoutController extends Controller
 
         $address = $gov->name_ar . ' - ' . $city->name_ar;
 
-        // نفس طريقة الحساب القديمة
-        $taxFast   = Cart::instance('shopping')->content()
-            ->sum(fn($p) => $p->qty * ($p->model->tax ?? 10));
-        $taxNormal = Cart::instance('shopping')->content()
-            ->sum(fn($p) => $p->qty * ($p->model->slowTax ?? 10));
+        $taxFast = 0;
+        $taxNormal = 0;
+
+        foreach (Cart::instance('shopping')->content() as $item) {
+            $quantity = $item->qty;
+            if ($quantity > 1) {
+                // الكتاب الأول بدون ضريبة، الباقي بضريبة
+                $taxableQuantity = $quantity - 1;
+                $taxFast += $taxableQuantity * ($item->model->tax ?? 10);
+                $taxNormal += $taxableQuantity * ($item->model->slowTax ?? 10);
+            }
+        }
 
         if ($method->type === 'home') {
             $fee = $gov->home_cost + $taxFast + $baseFee;

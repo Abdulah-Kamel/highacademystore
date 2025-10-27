@@ -335,13 +335,18 @@ $discountAmount = session()->has('applied_discount')
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.all.min.js"></script>
 
         @php
-            $productTax = 0;
-            $productSlowTax = 0;
-            foreach (Cart::instance('shopping')->content() as $product) {
-                $productTax += $product->qty * $product->model->tax;
-                $productSlowTax += $product->qty * $product->model->slowTax;
+        $productTax = 0;
+        $productSlowTax = 0;
+        foreach (Cart::instance('shopping')->content() as $product) {
+            $quantity = $product->qty;
+            if ($quantity > 1) {
+                // الكتاب الأول بدون ضريبة، الباقي بضريبة
+                $taxableQuantity = $quantity - 1;
+                $productTax += $taxableQuantity * $product->model->tax;
+                $productSlowTax += $taxableQuantity * $product->model->slowTax;
             }
-        @endphp
+        }
+    @endphp
 
         <script>
             const TAX_HOME = {{ $productTax }};

@@ -19,7 +19,16 @@
 <script src="{{ asset('/front') }}/js/main.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-
+<style>
+    .rtl-swal .swal-text {
+        text-align: center !important;
+        direction: rtl;
+    }
+    .rtl-swal .swal-title {
+        text-align: center !important;
+        direction: rtl;
+    }
+    </style>
 @yield('js');
 <!-- Start Cart Script -->
 <script>
@@ -63,10 +72,28 @@
                     $('body #header-ajax').html(data['header']);
                     $('body #cart_counter').html(data['cart_count']);
                     swal({
-                        title: "!احسنت",
-                        text: data['message'],
+                        title: "!تم إضافة المنتج بنجاح",
+                        text: data['message'] + "\n\n هل تريد متابعة التسوق أو الانتقال للسلة؟",
                         icon: "success",
-                        button: "OK!",
+                        className: "rtl-swal",
+                        buttons: {
+                            continue: {
+                                text: "متابعة التسوق",
+                                value: "continue",
+                                className: "btn rounded-2 bg-blue text-white"
+                            },
+                            cart: {
+                                text: "اذهب للسلة وأكمل الدفع",
+                                value: "cart",
+                                className: "btn rounded-2 bg-success text-white",
+                            }
+                        }
+                    }).then((value) => {
+                        if (value === "cart") {
+                            // Redirect to cart page
+                            window.location.href = "{{ route('user.cart') }}";
+                        }
+                        // If "continue", do nothing (stay on current page)
                     });
                 } else {
                     // عرض رسالة خطأ إذا كان المنتج غير متاح
